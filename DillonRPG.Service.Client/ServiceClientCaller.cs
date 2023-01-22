@@ -11,6 +11,13 @@ public class ServiceClientCaller
         _logger = logger;
         _client = client; 
     }
+    
+ 
+    public void Dispose()
+    {
+        _client.Dispose();
+        GC.SuppressFinalize(this);
+    }
 
     /// <summary>
     /// Sets the authentication header value from token gained from the parameter function "getToken".

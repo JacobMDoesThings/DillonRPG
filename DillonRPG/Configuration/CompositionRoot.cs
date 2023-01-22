@@ -11,16 +11,20 @@ internal static class CompositionRoot
         {
             throw new ArgumentNullException($"{nameof(CosmosRepositoryOptions)} is required");
         }
-        services.AddScoped(o => new GraphApiClientService(settings.GraphApi!));
+        services.ConfigureCaching();
+        services.AddSingleton(settings.GraphApi!);
+        services.AddScoped<GraphApiClientService>();
         services.AddTransient<IClaimsTransformation, GraphApiClaimsTransformation>();
         services.AddCosmosClient(settings.CosmosRepositoryOptions);
         services.AddQueryRepository<DillonRPGContext>();
         services.AddGenericRepository<DillonRPGContext>();
-        services.ConfigureCaching();
+       
 
         return services;
 
     }
+
+
 
     internal static IServiceCollection ConfigureSecurity(this IServiceCollection services, IConfiguration configuration)
     {
@@ -51,10 +55,9 @@ internal static class CompositionRoot
     internal static IServiceCollection ConfigureCaching(this IServiceCollection services)
     {
        services.AddSingleton(x => new MemoryCacheEntryOptions()
-              .SetAbsoluteExpiration(TimeSpan.FromDays(1))
+              .SetAbsoluteExpiration(TimeSpan.FromHours(2))
               .SetPriority(CacheItemPriority.Normal));
-       return services.AddSingleton<IMemoryCache, MemoryCache>();
-       
+       return services.AddSingleton<IMemoryCache, MemoryCache>();      
     }
 
     private static AppSettings BindSettings()

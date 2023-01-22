@@ -3,10 +3,25 @@
 <PageTitle>Counter</PageTitle>
 
 <h1>Counter</h1>
+<AuthorizeView Policy="@DillonGodMode.SecurityGroupPolicyName">
+    <Authorized>
+        God Mode.
+        <p role="status">Current count: @currentCount</p>
 
-<p role="status">Current count: @currentCount</p>
+        <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+        <AuthorizeView Context="Test" Policy="@Test.SecurityGroupPolicyName">
+            Test Mode.
+        </AuthorizeView>
+    </Authorized>
+    <NotAuthorized>
+        Not God Mode.
+        <AuthorizeView Context="Test" Policy="@Test.SecurityGroupPolicyName">
+            Test Mode.
+        </AuthorizeView>
+    </NotAuthorized>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+</AuthorizeView>
+
 
 @code {
     private int currentCount = 0;

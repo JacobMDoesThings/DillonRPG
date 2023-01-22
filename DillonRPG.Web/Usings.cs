@@ -11,6 +11,7 @@ global using DillonRPG.Service.Client;
 global using Microsoft.AspNetCore.Authentication;
 global using System.Security.Claims;
 global using Refit;
+global using Microsoft.Extensions.Caching.Memory;
 global using DillonRPG.Common.SecurityConfiguration;
 global using static DillonRPG.Common.SecurityConfiguration.SecurityConstants;
 
