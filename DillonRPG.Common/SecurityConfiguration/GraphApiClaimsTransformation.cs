@@ -1,4 +1,6 @@
 ﻿
+using System.Security.Claims;
+
 namespace DillonRPG.Common.SecurityConfiguration;
 
 public class GraphApiClaimsTransformation : IClaimsTransformation
@@ -16,6 +18,7 @@ public class GraphApiClaimsTransformation : IClaimsTransformation
     public async Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
     {
         ClaimsIdentity claimsIdentity = new ClaimsIdentity();
+
         var groupClaimType = "group";
         if (!principal.HasClaim(claim => claim.Type == groupClaimType))
         {
@@ -28,18 +31,18 @@ public class GraphApiClaimsTransformation : IClaimsTransformation
                 return principal;
             }
 
+            claimsIdentity.Label = id.Value;
+
             var groupIds = await _graphApiClientService.GetGraphApiUserMemberGroups(id.Value);
 
             foreach (var groupId in groupIds.ToList())
             {
-                claimsIdentity.AddClaim(new Claim(groupClaimType, groupId));
+                var claim = new Claim(groupClaimType, groupId);
+                claimsIdentity.AddClaim(claim);
+                _logger.LogInformation("Added claim {claim} to identity {claimsIdentity.Label}", claim, claimsIdentity.Label);
             }
-        }
 
-        principal.AddIdentity(claimsIdentity);
-        foreach (var claim in claimsIdentity.Claims)
-        {
-            _logger.LogInformation($"Added claim to principal {claim.Value}");
+            principal.AddIdentity(claimsIdentity);
         }
        
         return principal;
