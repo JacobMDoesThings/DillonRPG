@@ -1,4 +1,5 @@
 ﻿
+
 namespace DillonRPG.Web.Configuration;
 
 internal static class CompositionRoot
@@ -12,8 +13,9 @@ internal static class CompositionRoot
     public static IServiceCollection ConfigureServices(this IServiceCollection services, ConfigurationManager configuration)
     {
         AppSettings settings = BindSettings();
-
-        services.AddScoped(o => new GraphApiClientService(settings.GraphApi!));
+        services.ConfigureCaching();
+        services.AddSingleton(settings.GraphApi!);
+        services.AddScoped<GraphApiClientService>();
         services.AddTransient<IClaimsTransformation, GraphApiClaimsTransformation>();
         services.AddSingleton(service => new DillonRPGService()
         {
@@ -77,8 +79,21 @@ internal static class CompositionRoot
             {
                 policy.Requirements.Add(new MemberOfSecurityGroupRequirement(Test.SecurityGroupName!, Test.SecurityGroupId!));
             });
+
+            options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
         });
+
         return services;
+    }
+
+    internal static IServiceCollection ConfigureCaching(this IServiceCollection services)
+    {
+        services.AddSingleton(x => new MemoryCacheEntryOptions()
+               .SetAbsoluteExpiration(TimeSpan.FromHours(2))
+               .SetPriority(CacheItemPriority.Normal));
+        return services.AddSingleton<IMemoryCache, MemoryCache>();
     }
 
     /// <summary>

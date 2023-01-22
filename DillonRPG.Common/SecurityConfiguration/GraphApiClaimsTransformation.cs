@@ -1,5 +1,5 @@
 ﻿
-using System.Security.Claims;
+using System.Diagnostics;
 
 namespace DillonRPG.Common.SecurityConfiguration;
 
@@ -15,6 +15,7 @@ public class GraphApiClaimsTransformation : IClaimsTransformation
         _logger = logger;
     }
 
+    /// <inheritdoc/>
     public async Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
     {
         ClaimsIdentity claimsIdentity = new ClaimsIdentity();
@@ -33,7 +34,11 @@ public class GraphApiClaimsTransformation : IClaimsTransformation
 
             claimsIdentity.Label = id.Value;
 
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
             var groupIds = await _graphApiClientService.GetGraphApiUserMemberGroups(id.Value);
+            stopwatch.Stop();
+            _logger.LogInformation("Graph Api call time is {stopwatch.ElapsedMilliseconds}", stopwatch.ElapsedMilliseconds);
 
             foreach (var groupId in groupIds.ToList())
             {
@@ -44,7 +49,7 @@ public class GraphApiClaimsTransformation : IClaimsTransformation
 
             principal.AddIdentity(claimsIdentity);
         }
-       
+
         return principal;
     }
 }
