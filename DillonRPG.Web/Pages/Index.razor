@@ -1,0 +1,56 @@
+﻿@page "/"
+@inject IWeatherServiceClient _weatherClient;
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+<AuthorizeView Policy="@DillonGodMode.SecurityGroupPolicyName">
+    <Authorized>
+        God Mode.
+        @{
+            foreach (var forecast in forecasts)
+            {
+                <div>@forecast.TemperatureC</div>
+            }
+        }
+        <button class="btn btn-primary" @onclick="ShowStuff">Click to show</button>
+        <AuthorizeView Context="Test" Policy="@Test.SecurityGroupPolicyName">
+            Test Mode.
+        </AuthorizeView>
+    </Authorized>
+    <NotAuthorized>
+        Not God Mode.
+        <AuthorizeView Context="Test" Policy="@Test.SecurityGroupPolicyName">
+            Test Mode.
+        </AuthorizeView>
+    </NotAuthorized>
+
+</AuthorizeView>
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+@code {
+
+    List<WeatherForecast> forecasts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var result = await _weatherClient.GetWeatherForecast();
+
+        if (result.IsSuccessStatusCode)
+        {
+            forecasts = result.Content.ToList();
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    async void ShowStuff()
+    {
+ 
+    
+    }
+}

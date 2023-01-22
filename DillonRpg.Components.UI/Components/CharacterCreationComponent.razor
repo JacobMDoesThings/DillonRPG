@@ -1,0 +1,29 @@
+﻿<RadzenTabs TabPosition="@TabPosition.Top" Class="w-100 mb-5 mt-1 mx-auto" RenderMode="@TabRenderMode.Client">
+    <Tabs>
+
+        <RadzenTabsItem Text="Background">
+            <BackgroundCreationComponent />
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Race">
+            <RaceCreationComponent/>
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Class">
+            <ClassCreationComponent />
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Finalize">
+            finalize
+        </RadzenTabsItem>
+
+    </Tabs>
+
+</RadzenTabs>
+@code {
+}
+<style>
+    ul[role=tablist] {
+        flex-wrap: wrap;
+    }
+</style>

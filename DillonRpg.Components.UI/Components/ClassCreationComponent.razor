@@ -1,0 +1,203 @@
+﻿<div class="h-100 w-100 overflow-auto">
+    <div>
+        <span>
+            <label for="ClassDropdown"><RadzenText class="rz-color-primary-dark">Select Class</RadzenText></label>
+            <RadzenDropDown AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" id="ClassDropdown"
+                            Data="Classes" Value="SelectedClass" TValue="string" ValueChanged="OnSelectedClassChange" />
+        </span>
+    </div>
+    <div class="ms-5 mt-2">
+        <span>
+            <label for="SecondaryClass">
+                <RadzenText class="rz-color-primary-dark">
+                    Select Secondary Class
+                    @{
+                        if (_loading)
+                        {
+                            <br />
+                            <RadzenText class="rz-color-secondary" TextStyle="TextStyle.Caption"> Loading...</RadzenText>
+                            <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Secondary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+                        }
+                    }
+                </RadzenText>
+            </label>
+            <RadzenDropDown Disabled="_secondaryDropdownDisabled" id="SecondaryClass"
+                            Data="SecondaryClasses" Value="SelectedSecondaryClass" TValue="string" ValueChanged="OnSelectedSecondaryClassChange"
+                            AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" />
+
+        </span>
+    </div>
+
+    <div class="w-100 mt-3">
+        @{
+            if (Rules.Count > 0)
+            {
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.H6" Class="rz-color-primary-light"><strong>Traits</strong></RadzenText>
+                    <ul>
+                        @{
+                            foreach (var rule in Rules)
+                            {
+                                <li class="d-inline-flex pe-2 pb-2">
+                                    <RadzenText class="rz-color-primary-dark">@rule.Name</RadzenText>
+
+                                </li>
+                                <ul>
+                                    @{
+                                        foreach (var description in rule.Rules)
+                                        {
+                                            <li class="d-inline-flex pe-2 pb-2">
+                                                <RadzenText class="rz-color-secondary-light">@description</RadzenText>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    </ul>
+                </RadzenCard>
+
+                <div class=" my-3">
+                    <label for="BackgroundDescription"><RadzenText class="rz-color-primary-dark">Background Description</RadzenText></label>
+                    <RadzenTextArea Disabled="true" id="BackgroundDescription" Rows="10" Value="@_description" class="w-100" />
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    List<Rule> Rules = new();
+    bool _loading;
+    List<string> Classes = new();
+    List<string> SecondaryClasses = new();
+    string SelectedClass = string.Empty;
+    string SelectedSecondaryClass = string.Empty;
+    bool _secondaryDropdownDisabled = true;
+    string _secondaryPlaceHolder = string.Empty;
+    string _description = string.Empty;
+    const string DescriptionBase = "Generic Description...";
+
+    bool loading
+    {
+        get => _loading;
+        set
+        {
+            _loading = value;
+            InvokeAsync(StateHasChanged);
+        }
+
+    }
+
+    protected override void OnInitialized()
+    {
+        Classes.AddRange(new List<string>() { "Warrior", "Wizard", "Druid", "Space Cowboy", "Engineering Student" });
+        SecondaryClasses.AddRange(new List<string>() { "None" , "Warrior", "Wizard", "Druid", "Space Cowboy", "Engineering Student" });
+        base.OnInitialized();
+    }
+
+    private void CreateRulesForPrimary()
+    {
+        Rules.Add(new Rule
+            {
+                Name = "Barbarianism",
+                Rules = new List<string>
+            {
+            "+2 attack",
+            "+1 AC"
+            }
+            });
+
+        Rules.Add(new Rule
+            {
+                Name = "Sickly",
+                Rules = new List<string>
+            {
+            "+2 Constitution",
+            "-2 Charisma"
+            }
+            });
+        Rules.Add(new Rule
+            {
+                Name = "NightStalker",
+                Rules = new List<string>
+            {
+            "Night Vision"
+            }
+            });
+    }
+
+    private void CreateRulesForSecondary()
+    {
+        Rules.Add(new Rule
+            {
+                Name = "Sly",
+                Rules = new List<string>
+            {
+            "+1 Sneak",
+            "+1 Charisma"
+            }
+            });
+
+        Rules.Add(new Rule
+            {
+                Name = "Quick Draw",
+                Rules = new List<string>
+            {
+            "+2 Dex",
+            "-1 Speed"
+            }
+            });
+        Rules.Add(new Rule
+            {
+                Name = "Good Listener",
+                Rules = new List<string>
+            {
+            "Excellent Hearing"
+            }
+            });
+    }
+
+
+    private async void OnSelectedClassChange(object val)
+    {
+        Rules.Clear();
+        string value = val as string ?? string.Empty;
+        SelectedClass = value;
+        if (!string.IsNullOrEmpty(value))
+        {
+            loading = true;
+            await Task.Delay(2000);
+            _description = $"{value} {DescriptionBase}";
+            _secondaryDropdownDisabled = false;
+        }
+        else
+        {
+            _secondaryDropdownDisabled = true;
+        }
+
+        CreateRulesForPrimary();
+        loading = false;
+    }
+
+    private void OnSelectedSecondaryClassChange(object val)
+    {
+        Rules.Clear();
+        string value = val as string ?? string.Empty;
+        SelectedSecondaryClass = value;
+        CreateRulesForPrimary();
+        _description = $"{SelectedClass} {DescriptionBase}";
+        if (!SelectedSecondaryClass.Equals("None", StringComparison.OrdinalIgnoreCase))
+        {
+            _description += $"\n{value} {DescriptionBase}";
+            CreateRulesForSecondary();
+
+        }
+    }
+
+    private struct Rule
+    {
+        public string Name;
+        public List<string> Rules;
+    }
+}

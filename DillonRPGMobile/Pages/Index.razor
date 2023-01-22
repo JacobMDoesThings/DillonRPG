@@ -1,0 +1,55 @@
+﻿@page "/"
+@using DillonRPG.Common;
+@inject IAccountManager _accountManager;
+@inject IWeatherServiceClient _weatherClient;
+<AuthorizeView>
+    <Authorized>
+
+        <h1>Hello, world!</h1>
+
+        Welcome to your new app.
+        <button class="btn btn-primary" @onclick="LoadData">Load Data</button>
+      @Forecasts.Count;
+
+        <SurveyPrompt Title="How is Blazor working for you?" />
+        <button class="btn btn-primary" @onclick=(Logout)>Logout</button>
+    </Authorized>
+    <NotAuthorized>
+        Not Authorized.
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    List<WeatherForecast> Forecasts = new();
+    private async Task LoadData()
+    {
+        try
+        {
+            var result = await _weatherClient.GetWeatherForecast();
+            if (result.IsSuccessStatusCode)
+            {
+                Forecasts = result.Content.ToList();
+
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.Write(e);
+
+        }
+    
+    }
+    protected override async Task OnInitializedAsync()
+    {
+
+        await base.OnInitializedAsync();
+    }
+
+    private void Logout()
+    {
+        _accountManager.Logout();
+        InvokeAsync(StateHasChanged);
+    }
+
+
+}

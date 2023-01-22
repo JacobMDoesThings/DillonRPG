@@ -1,0 +1,15 @@
+﻿@page "/CharacterCreation"
+@inject TooltipService _tooltipService;
+
+<AuthorizeView>
+    <Authorized>
+        <CharacterCreationComponent/>  
+    </Authorized>
+    <NotAuthorized>
+        Not Authorized.
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+}

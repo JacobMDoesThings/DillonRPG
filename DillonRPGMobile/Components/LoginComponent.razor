@@ -1,0 +1,36 @@
+﻿@inject AuthenticationStateProvider _authStateProvider
+@inject IAccountManager _accountManager;
+@inject NavigationManager _navigationManager
+
+@{
+    if (_loggingIn)
+    {
+        <div class="d-flex align-items-center justify-content-center vh-100 vw-100">
+            <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Secondary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+        </div>
+    }
+    else
+    {
+        <div class="d-flex align-items-center justify-content-center vh-100 vw-100">
+            <button class="btn btn-primary" @onclick="Login">Login or Create Account.</button>
+        </div>
+    }
+}
+@code {
+    private bool _loggingIn;
+
+    protected override Task OnInitializedAsync()
+    {
+        _loggingIn = true;
+        _accountManager.Login(true);
+        _loggingIn = false;
+
+        return base.OnInitializedAsync();
+    }
+    private async Task Login()
+    {
+        _loggingIn = true;
+        await _accountManager.Login();
+        _loggingIn = false;
+    }
+}
