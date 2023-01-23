@@ -1,4 +1,4 @@
-﻿namespace DillonRPG.Common.SecurityConfiguration;
+﻿namespace DillonRPG.Common.Configuration;
 public class SecurityGroup
 {
     public string? SecurityGroupName { get; set; }

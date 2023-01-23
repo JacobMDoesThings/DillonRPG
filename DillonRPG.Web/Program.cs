@@ -1,7 +1,8 @@
 
-var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
-builder.Services.ConfigureServices(builder.Configuration);
-builder.Services.ConfigureSecurity(builder.Configuration);
+var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
+builder.Services.ConfigureServices(configuration);
+builder.Services.ConfigureSecurity(configuration);
 builder.Services.ConfigureApis();
 builder.Services.AddSingleton<WeatherForecastService>();
 

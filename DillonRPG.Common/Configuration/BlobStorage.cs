@@ -1,4 +1,4 @@
-﻿namespace DillonRPG.Service.Configuration;
+﻿namespace DillonRPG.Common.Configuration;
 
 public class BlobStorage
 {

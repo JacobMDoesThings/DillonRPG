@@ -3,46 +3,55 @@ namespace DillonRPG.Service.Configuration;
 
 internal static class CompositionRoot
 {
-    internal static IServiceCollection ConfigureDependencies(this IServiceCollection services)
+    internal static IServiceCollection ConfigureDependencies(this IServiceCollection services, ConfigurationManager configuration)
     {
-        var settings = BindSettings();
+        var settings = configuration.BindSettings();
 
         if (settings.CosmosRepositoryOptions is null)
         {
             throw new ArgumentNullException($"{nameof(CosmosRepositoryOptions)} is required");
         }
-        services.AddScoped(o => new GraphApiClientService(settings.GraphApi!));
+        services.ConfigureCaching();
+        services.AddSingleton(settings.GraphApi!);
+        services.AddScoped<GraphApiClientService>();
         services.AddTransient<IClaimsTransformation, GraphApiClaimsTransformation>();
         services.AddCosmosClient(settings.CosmosRepositoryOptions);
         services.AddQueryRepository<DillonRPGContext>();
         services.AddGenericRepository<DillonRPGContext>();
-        services.ConfigureCaching();
+
 
         return services;
 
     }
 
-    internal static IServiceCollection ConfigureSecurity(this IServiceCollection services, IConfiguration configuration)
+
+
+    internal static IServiceCollection ConfigureSecurity(this IServiceCollection services, ConfigurationManager configuration)
     {
+        var settings = configuration.BindSettings();
         services.AddMicrosoftIdentityWebApiAuthentication(configuration, "AzureAdB2C")
-        //.AddMicrosoftIdentityWebApi(configuration, "AzureAdB2C")
         .EnableTokenAcquisitionToCallDownstreamApi()
-        .AddMicrosoftGraph(configuration.GetSection("GraphApi"))
+        .AddMicrosoftGraph(configuration.GetSection(nameof(settings.GraphApi)))
         .AddDistributedTokenCaches();
 
         services.AddSingleton<IAuthorizationHandler, IsInGroupHandlerUsingAzureGroups>();
-
         services.AddAuthorization(options =>
         {
-            options.AddPolicy(DillonGodMode.SecurityGroupPolicyName!, policy =>
+            options.AddPolicy(settings.SecurityGroups!.DillonGodMode!.SecurityGroupPolicyName!, policy =>
             {
-                policy.Requirements.Add(new MemberOfSecurityGroupRequirement(DillonGodMode.SecurityGroupName!, DillonGodMode.SecurityGroupId!));
+                policy.Requirements.Add(new MemberOfSecurityGroupRequirement(settings.SecurityGroups!.DillonGodMode!.SecurityGroupName!,
+                    settings.SecurityGroups!.DillonGodMode!.SecurityGroupId!));
             });
 
-            options.AddPolicy(Test.SecurityGroupPolicyName!, policy =>
+            options.AddPolicy(settings.SecurityGroups!.Test!.SecurityGroupPolicyName!, policy =>
             {
-                policy.Requirements.Add(new MemberOfSecurityGroupRequirement(Test.SecurityGroupName!, Test.SecurityGroupId!));
+                policy.Requirements.Add(new MemberOfSecurityGroupRequirement(settings.SecurityGroups!.Test.SecurityGroupName!,
+                    settings.SecurityGroups!.Test.SecurityGroupId!));
             });
+
+            options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
         });
 
         return services;
@@ -50,21 +59,22 @@ internal static class CompositionRoot
 
     internal static IServiceCollection ConfigureCaching(this IServiceCollection services)
     {
-       services.AddSingleton(x => new MemoryCacheEntryOptions()
-              .SetAbsoluteExpiration(TimeSpan.FromDays(1))
-              .SetPriority(CacheItemPriority.Normal));
-       return services.AddSingleton<IMemoryCache, MemoryCache>();
-       
+        services.AddSingleton(x => new MemoryCacheEntryOptions()
+               .SetAbsoluteExpiration(TimeSpan.FromHours(2))
+               .SetPriority(CacheItemPriority.Normal));
+        return services.AddSingleton<IMemoryCache, MemoryCache>();
     }
 
-    private static AppSettings BindSettings()
+    internal static AppSettings BindSettings(this IConfigurationRoot configurationRoot)
     {
-        IConfigurationRoot configuration = new ConfigurationBuilder().BuildConfiguration();
+        AppSettings settings = new()
+        {
+            CosmosRepositoryOptions = configurationRoot.GetSection("CosmosRepositoryOptions").Get<CosmosRepositoryOptions>(),
+            BlobStorage = configurationRoot.GetSection("BlobStorage").Get<BlobStorage>(),
+            GraphApi = configurationRoot.GetRequiredSection("GraphApi").Get<GraphApi>(),
+            SecurityGroups = configurationRoot.GetSection("SecurityGroups").Get<SecurityGroups>()
+        };
 
-        AppSettings settings = new();
-        settings.CosmosRepositoryOptions = configuration.GetSection("CosmosRepositoryOptions").Get<CosmosRepositoryOptions>();
-        settings.BlobStorage = configuration.GetSection("BlobStorage").Get<BlobStorage>();
-        settings.GraphApi = configuration.GetRequiredSection("GraphApi").Get<GraphApi>();
         return settings;
     }
 
