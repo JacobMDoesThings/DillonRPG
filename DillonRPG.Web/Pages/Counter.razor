@@ -1,21 +1,22 @@
 ﻿@page "/counter"
+@inject SecurityGroups _sg;
 
 <PageTitle>Counter</PageTitle>
 
 <h1>Counter</h1>
-<AuthorizeView Policy="@DillonGodMode.SecurityGroupPolicyName">
+<AuthorizeView Policy="@_sg.DillonGodMode!.SecurityGroupPolicyName">
     <Authorized>
         God Mode.
         <p role="status">Current count: @currentCount</p>
 
         <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
-        <AuthorizeView Context="Test" Policy="@Test.SecurityGroupPolicyName">
+        <AuthorizeView Context="Test" Policy="@_sg.Test!.SecurityGroupPolicyName">
             Test Mode.
         </AuthorizeView>
     </Authorized>
     <NotAuthorized>
         Not God Mode.
-        <AuthorizeView Context="Test" Policy="@Test.SecurityGroupPolicyName">
+        <AuthorizeView Context="Test" Policy="@_sg.Test!.SecurityGroupPolicyName">
             Test Mode.
         </AuthorizeView>
     </NotAuthorized>

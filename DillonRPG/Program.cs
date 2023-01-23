@@ -1,28 +1,14 @@
 
-using Microsoft.AspNetCore.Authentication;
-
 var builder = WebApplication.CreateBuilder(args);
-var Configuration = builder.Configuration;
+var configuration = builder.Configuration;
 // Add services to the container.
-builder.Services.ConfigureDependencies();
-
+builder.Services.ConfigureDependencies(configuration);
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.ConfigureSecurity(Configuration);
-
-//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//    .AddMicrosoftIdentityWebApi(options =>
-//    {
-//        builder.Configuration.Bind("AzureAdB2C", options);     
-//    },
-//options => { builder.Configuration.Bind("AzureAdB2C", options); })
-
-
-
-
+builder.Services.ConfigureSecurity(configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();

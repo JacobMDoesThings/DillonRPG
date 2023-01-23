@@ -10,9 +10,10 @@ internal static class CompositionRoot
     /// <param name="services">The ServiceCollection.</param>
     /// <param name="configuration">The appsettings configuration.</param>
     /// <returns>Configured security services.</returns>
-    public static IServiceCollection ConfigureServices(this IServiceCollection services, ConfigurationManager configuration)
+    internal static IServiceCollection ConfigureServices(this IServiceCollection services, ConfigurationManager configuration)
     {
-        AppSettings settings = BindSettings();
+        var settings = configuration.BindSettings();
+
         services.ConfigureCaching();
         services.AddSingleton(settings.GraphApi!);
         services.AddScoped<GraphApiClientService>();
@@ -39,8 +40,9 @@ internal static class CompositionRoot
     /// <param name="services">The ServiceCollection.</param>
     /// <param name="configuration">The appsettings configuration.</param>
     /// <returns>Configured security services.</returns>
-    public static IServiceCollection ConfigureSecurity(this IServiceCollection services, ConfigurationManager configuration)
+    internal static IServiceCollection ConfigureSecurity(this IServiceCollection services, ConfigurationManager configuration)
     {
+        var settings = configuration.BindSettings();
 
         // This is required to be instantiated before the OpenIdConnectOptions starts getting configured.
         // By default, the claims mapping will map claim names in the old format to accommodate older SAML applications.
@@ -49,10 +51,10 @@ internal static class CompositionRoot
         JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
         // Configuration to sign-in users with Azure AD B2C.
-        services.AddMicrosoftIdentityWebAppAuthentication(configuration, "AzureAdB2C")
+        services.AddMicrosoftIdentityWebAppAuthentication(configuration, nameof(settings.AzureAdB2C))
         .EnableTokenAcquisitionToCallDownstreamApi()
-        .AddDownstreamWebApi("DillonRPGService", configuration.GetSection("DillonRPGService"))
-        .AddMicrosoftGraph(configuration.GetSection("GraphApi"))
+        .AddDownstreamWebApi(nameof(settings.DillonRPGService), configuration.GetSection(nameof(settings.DillonRPGService)))
+        .AddMicrosoftGraph(configuration.GetSection(nameof(settings.GraphApi)))
         .AddDistributedTokenCaches();
 
         services.AddControllersWithViews(options =>
@@ -70,14 +72,16 @@ internal static class CompositionRoot
 
         services.AddAuthorization(options =>
         {
-            options.AddPolicy(DillonGodMode.SecurityGroupPolicyName!, policy =>
+            options.AddPolicy(settings.SecurityGroups!.DillonGodMode!.SecurityGroupPolicyName!, policy =>
             {
-                policy.Requirements.Add(new MemberOfSecurityGroupRequirement(DillonGodMode.SecurityGroupName!, DillonGodMode.SecurityGroupId!));
+                policy.Requirements.Add(new MemberOfSecurityGroupRequirement(settings.SecurityGroups!.DillonGodMode!.SecurityGroupName!,
+                    settings.SecurityGroups!.DillonGodMode!.SecurityGroupId!));
             });
 
-            options.AddPolicy(Test.SecurityGroupPolicyName!, policy =>
+            options.AddPolicy(settings.SecurityGroups!.Test!.SecurityGroupPolicyName!, policy =>
             {
-                policy.Requirements.Add(new MemberOfSecurityGroupRequirement(Test.SecurityGroupName!, Test.SecurityGroupId!));
+                policy.Requirements.Add(new MemberOfSecurityGroupRequirement(settings.SecurityGroups!.Test.SecurityGroupName!, 
+                    settings.SecurityGroups!.Test.SecurityGroupId!));
             });
 
             options.DefaultPolicy = new AuthorizationPolicyBuilder()
@@ -85,6 +89,7 @@ internal static class CompositionRoot
                 .Build();
         });
 
+        services.AddSingleton(settings.SecurityGroups!);
         return services;
     }
 
@@ -101,20 +106,23 @@ internal static class CompositionRoot
     /// </summary>
     /// <param name="services">The Service Collection</param>
     /// <returns>Configured ApiServices</returns>
-    public static IServiceCollection ConfigureApis(this IServiceCollection services)
+    internal static IServiceCollection ConfigureApis(this IServiceCollection services)
     {
         return services.AddScoped<IWeatherServiceClient, WeatherServiceClient>();
     }
 
-    private static AppSettings BindSettings()
+    internal static AppSettings BindSettings(this IConfigurationRoot configurationRoot)
     {
-        IConfigurationRoot configuration = new ConfigurationBuilder().BuildConfiguration();
+        var check = configurationRoot.GetSection("SecurityGroups").Get<SecurityGroups>();
+
         AppSettings settings = new()
         {
             // AzureAdB2C = configuration.GetSection("AzureAdB2C").Get<AzureAdB2C>(),
-            GraphApi = configuration.GetRequiredSection("GraphApi").Get<GraphApi>(),
-            DillonRPGService = configuration.GetSection("DillonRPGService").Get<DillonRPGService>()
+            GraphApi = configurationRoot.GetRequiredSection("GraphApi").Get<GraphApi>(),
+            DillonRPGService = configurationRoot.GetSection("DillonRPGService").Get<DillonRPGService>(),
+            SecurityGroups = configurationRoot.GetSection("SecurityGroups").Get<SecurityGroups>()
         };
+
         return settings;
     }
     private static IConfigurationRoot BuildConfiguration(this IConfigurationBuilder configurationBuilder)

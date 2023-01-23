@@ -1,12 +1,13 @@
 ﻿@page "/"
 @inject IWeatherServiceClient _weatherClient;
+@inject SecurityGroups _sg;
 
 <PageTitle>Index</PageTitle>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
-<AuthorizeView Policy="@DillonGodMode.SecurityGroupPolicyName">
+<AuthorizeView Policy="@_sg.DillonGodMode!.SecurityGroupPolicyName">
     <Authorized>
         God Mode.
         @{
@@ -16,13 +17,13 @@ Welcome to your new app.
             }
         }
         <button class="btn btn-primary" @onclick="ShowStuff">Click to show</button>
-        <AuthorizeView Context="Test" Policy="@Test.SecurityGroupPolicyName">
+        <AuthorizeView Context="Test" Policy="@_sg.Test!.SecurityGroupPolicyName">
             Test Mode.
         </AuthorizeView>
     </Authorized>
     <NotAuthorized>
         Not God Mode.
-        <AuthorizeView Context="Test" Policy="@Test.SecurityGroupPolicyName">
+        <AuthorizeView Context="Test" Policy="@_sg.Test!.SecurityGroupPolicyName">
             Test Mode.
         </AuthorizeView>
     </NotAuthorized>
