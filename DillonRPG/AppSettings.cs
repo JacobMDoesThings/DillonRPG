@@ -1,4 +1,5 @@
-﻿namespace DillonRPG.Service;
+﻿
+namespace DillonRPG.Service;
 
 internal class AppSettings
 {

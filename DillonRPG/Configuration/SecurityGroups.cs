@@ -1,5 +1,4 @@
-﻿
-namespace DillonRPG.Service.Configuration;
+﻿namespace DillonRPG.Common.Configuration;
 
 internal class SecurityGroups
 {

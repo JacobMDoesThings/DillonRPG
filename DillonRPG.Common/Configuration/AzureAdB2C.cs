@@ -1,4 +1,4 @@
-﻿namespace DillonRPG.Web.Configuration;
+﻿namespace DillonRPG.Common.Configuration;
 
 public class AzureAdB2C
 {

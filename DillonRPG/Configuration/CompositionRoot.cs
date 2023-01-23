@@ -1,7 +1,4 @@
 ﻿
-using DillonRPG.Common.Configuration;
-using Microsoft.Extensions.Configuration;
-
 namespace DillonRPG.Service.Configuration;
 
 internal static class CompositionRoot
