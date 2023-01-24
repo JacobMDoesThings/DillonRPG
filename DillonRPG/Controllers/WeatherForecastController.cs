@@ -22,9 +22,8 @@ namespace DillonRPG.Service.Controllers
 
         [Authorize(Policy = "GodModePolicy")]
         [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public ActionResult<IEnumerable<WeatherForecast>> Get()
         {
-            var test = HttpContext.User;
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
