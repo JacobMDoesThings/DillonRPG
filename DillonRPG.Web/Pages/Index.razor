@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject IWeatherServiceClient _weatherClient;
+@inject ILogger<Index> _logger;
 @inject SecurityGroups _sg;
 
 <PageTitle>Index</PageTitle>
@@ -11,12 +12,14 @@ Welcome to your new app.
     <Authorized>
         God Mode.
         @{
-            foreach (var forecast in forecasts)
+            if (forecasts is not null)
             {
-                <div>@forecast.TemperatureC</div>
+                foreach (var forecast in forecasts)
+                {
+                    <div>@forecast.TemperatureC</div>
+                }
             }
         }
-        <button class="btn btn-primary" @onclick="ShowStuff">Click to show</button>
         <AuthorizeView Context="Test" Policy="@_sg.Test!.SecurityGroupPolicyName">
             Test Mode.
         </AuthorizeView>
@@ -33,25 +36,25 @@ Welcome to your new app.
 <SurveyPrompt Title="How is Blazor working for you?" />
 
 @code {
+    private bool _loadData;
+    IEnumerable<WeatherForecast>? forecasts;
 
-    List<WeatherForecast> forecasts = new();
-
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
-        var result = await _weatherClient.GetWeatherForecast();
-
-        if (result.IsSuccessStatusCode)
+        if (firstRender)
         {
-            forecasts = result.Content.ToList();
+            await _weatherClient.GetWeatherForecast().HandleResults<IEnumerable<WeatherForecast>>(success: async (result) =>
+            {
+                forecasts = result.Content;
+                _loadData = true;
+                await InvokeAsync(StateHasChanged);
+            },
+            failure: (result) =>
+            {
+                result.Error!.LogFailure(_logger, nameof(WeatherServiceClient.GetWeatherForecast));
+            });
+
+            base.OnAfterRender(firstRender);
         }
-
-        await base.OnInitializedAsync();
-    }
-
-    async void ShowStuff()
-    {
- 
-    
     }
 }
