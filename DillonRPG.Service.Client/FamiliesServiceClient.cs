@@ -1,4 +1,4 @@
-﻿namespace DillonRPG.Web.Data;
+﻿namespace DillonRPG.Service.Client;
 
 public class FamiliesServiceClient : ServiceClient, IFamiliesServiceClient
 {

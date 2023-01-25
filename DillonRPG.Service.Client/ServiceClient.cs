@@ -1,5 +1,5 @@
 ﻿
-namespace DillonRPG.Web.Data;
+namespace DillonRPG.Service.Client;
 
 public abstract class ServiceClient
 {
