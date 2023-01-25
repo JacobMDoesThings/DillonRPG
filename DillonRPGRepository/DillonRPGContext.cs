@@ -11,6 +11,11 @@ public class DillonRPGContext : DbContext
     //    _entityTypeBuilder.Property(x => x.FolderName);
     //};
 
+    private readonly Action<EntityTypeBuilder<AbilityEntity>> _configureAbilityEntitity = (_entityTypeBuilder) =>
+    {
+        _entityTypeBuilder.Property(x => x.Name);
+    };
+
     public DillonRPGContext(DbContextOptions options)
         : base(options)
     { 
@@ -21,6 +26,8 @@ public class DillonRPGContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder
+            .ConfigureEntityDefault<AbilityEntity>("abilities", _configureAbilityEntitity);
         //modelBuilder
         //    .ConfigureEntityDefault<ImageEntity>("images", _configureImageEntity);
     }

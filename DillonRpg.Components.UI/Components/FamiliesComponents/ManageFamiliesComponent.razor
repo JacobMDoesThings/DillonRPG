@@ -1,0 +1,29 @@
+﻿<RadzenText Text="Manage Families" TextStyle="TextStyle.H3" />
+
+@{
+    if (_showCreateFamilyComponent)
+    {
+        <CreateFamilyComponent HideComponent="()=>_showCreateFamilyComponent = false" />
+    }
+    else
+    {
+        <RadzenButton class="mb-3" Shade="Shade.Lighter" Click=@(() => _showCreateFamilyComponent = true) Text="Create Family" ButtonStyle="ButtonStyle.Primary" />
+    }
+}
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="25" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@Families" TItem="Family" LogicalFilterOperator="LogicalFilterOperator.Or">
+    <Columns>
+        <RadzenDataGridColumn TItem="Family" Property="@nameof(Family.Name)" Title="Family Name" Frozen="true" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter]
+    public IEnumerable<Family> Families { get; set; } = Enumerable.Empty<Family>();
+    private bool _showCreateFamilyComponent = true;
+    private void OnCreateFamilyClick()
+    {
+
+
+    }
+}

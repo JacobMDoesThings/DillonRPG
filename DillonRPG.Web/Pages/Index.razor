@@ -1,60 +1,88 @@
 ﻿@page "/"
-@inject IWeatherServiceClient _weatherClient;
+@inject IAbilitiesServiceClient _abilitiesClient;
+@inject IClassesServiceClient _classesClient;
+@inject IFamiliesServiceClient _familiesClient;
 @inject ILogger<Index> _logger;
 @inject SecurityGroups _sg;
 
 <PageTitle>Index</PageTitle>
-
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
 <AuthorizeView Policy="@_sg.DillonGodMode!.SecurityGroupPolicyName">
     <Authorized>
-        God Mode.
-        @{
-            if (forecasts is not null)
-            {
-                foreach (var forecast in forecasts)
-                {
-                    <div>@forecast.TemperatureC</div>
-                }
-            }
-        }
-        <AuthorizeView Context="Test" Policy="@_sg.Test!.SecurityGroupPolicyName">
-            Test Mode.
-        </AuthorizeView>
+        <ManageTribesComponent Abilities="abilities"
+                               Classes="classes" 
+                               Families="families" />
     </Authorized>
-    <NotAuthorized>
-        Not God Mode.
-        <AuthorizeView Context="Test" Policy="@_sg.Test!.SecurityGroupPolicyName">
-            Test Mode.
-        </AuthorizeView>
-    </NotAuthorized>
-
 </AuthorizeView>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
-
 @code {
-    private bool _loadData;
     IEnumerable<WeatherForecast>? forecasts;
+    private IEnumerable<Ability>? _abilities = Enumerable.Empty<Ability>();
+    private IEnumerable<Class>? _classes = Enumerable.Empty<Class>();
+    private IEnumerable<Family>? _families = Enumerable.Empty<Family>();
+
+    private IEnumerable<Ability>? abilities
+    {
+        get => _abilities;
+        set
+        {
+            _abilities = value;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private IEnumerable<Class>? classes
+    {
+        get => _classes;
+        set
+        {
+            _classes = value;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private IEnumerable<Family>? families
+    {
+        get => _families;
+        set
+        {
+            _families = value;
+            InvokeAsync(StateHasChanged);
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await _weatherClient.GetWeatherForecast().HandleResults<IEnumerable<WeatherForecast>>(success: async (result) =>
+            var getAbilities = _abilitiesClient.GetAbilities().HandleResults<IEnumerable<Ability>>(success: (result) =>
+           {
+               abilities = result.Content;
+           },
+           failure: (result) =>
+           {
+               result.Error!.LogFailure(_logger, nameof(AbilitiesServiceClient.GetAbilities));
+           });
+
+            var getClasses = _classesClient.GetClasses().HandleResults<IEnumerable<Class>>(success: (result) =>
+           {
+               classes = result.Content;
+           },
+           failure: (result) =>
+           {
+               result.Error!.LogFailure(_logger, nameof(ClassesServiceClient.GetClasses));
+           });
+
+            var getFamilies = _familiesClient.GetFamilies().HandleResults<IEnumerable<Family>>(success: (result) =>
             {
-                forecasts = result.Content;
-                _loadData = true;
-                await InvokeAsync(StateHasChanged);
+                families = result.Content;
             },
             failure: (result) =>
             {
-                result.Error!.LogFailure(_logger, nameof(WeatherServiceClient.GetWeatherForecast));
+                result.Error!.LogFailure(_logger, nameof(FamiliesServiceClient.GetFamilies));
             });
 
-            base.OnAfterRender(firstRender);
+            await Task.WhenAll(getAbilities, getClasses, getFamilies);
         }
+        base.OnAfterRender(firstRender);
     }
 }

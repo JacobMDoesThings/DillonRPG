@@ -1,0 +1,29 @@
+﻿<RadzenText Text="Manage Abilities" TextStyle="TextStyle.H3" />
+
+@{
+    if (_showCreateAbilityComponent)
+    {
+            <CreateAbilityComponent HideComponent="()=>_showCreateAbilityComponent = false"/>
+    }
+    else
+    {
+        <RadzenButton class="mb-3" Shade="Shade.Lighter" Click=@(() => _showCreateAbilityComponent = true) Text="Create Ability" ButtonStyle="ButtonStyle.Primary" />
+    }
+}
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="25" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@Abilities" TItem="Ability" LogicalFilterOperator="LogicalFilterOperator.Or">
+    <Columns>
+        <RadzenDataGridColumn TItem="Ability" Property="@nameof(Ability.Name)" Title="Ability Name" Frozen="true" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter]
+    public IEnumerable<Ability> Abilities { get; set; } = Enumerable.Empty<Ability>();
+    private bool _showCreateAbilityComponent = true;
+    private void OnCreateAbilityClick()
+    {
+
+
+    }
+}

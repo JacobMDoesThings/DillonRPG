@@ -34,11 +34,8 @@ public class GraphApiClaimsTransformation : IClaimsTransformation
 
             claimsIdentity.Label = id.Value;
 
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
+            
             var groupIds = await _graphApiClientService.GetGraphApiUserMemberGroups(id.Value);
-            stopwatch.Stop();
-            _logger.LogInformation("Graph Api call time is {stopwatch.ElapsedMilliseconds}", stopwatch.ElapsedMilliseconds);
 
             foreach (var groupId in groupIds.ToList())
             {

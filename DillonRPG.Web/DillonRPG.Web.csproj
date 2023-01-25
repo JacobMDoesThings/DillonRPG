@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DillonRpg.Components.UI\DillonRPG.Components.UI.csproj" />
     <ProjectReference Include="..\DillonRPG.Service.Client\DillonRPG.Service.Client.csproj" />
   </ItemGroup>
 

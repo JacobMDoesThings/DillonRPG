@@ -1,4 +1,4 @@
-namespace DillonRPG.Common.DTOs;
+namespace DillonRPG.Service.Client.DTOs;
 
 public class WeatherForecast
 {
