@@ -4,7 +4,6 @@ var configuration = builder.Configuration;
 builder.Services.ConfigureServices(configuration);
 builder.Services.ConfigureSecurity(configuration);
 builder.Services.ConfigureApis();
-builder.Services.AddSingleton<WeatherForecastService>();
 
 var app = builder.Build();
 

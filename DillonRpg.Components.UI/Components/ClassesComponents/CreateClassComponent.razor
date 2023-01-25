@@ -1,0 +1,18 @@
+﻿<RadzenText TextStyle="TextStyle.H6" Text="Create Class" />
+
+<div class="row mb-2">
+    <div class="col">
+        <RadzenLabel Text="Enter Class Name" />
+        <RadzenTextBox />
+    </div>
+</div>
+
+<div class="mb-3">
+    <RadzenButton class="me-2" Click=@(HideComponent) Text="Create" ButtonStyle="ButtonStyle.Primary" />
+    <RadzenButton Click=@(HideComponent) Text="Cancel" ButtonStyle="ButtonStyle.Secondary" />
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback HideComponent { get; set; }
+}

@@ -1,7 +1,7 @@
 ﻿global using DillonRPG.Service.Configuration;
 global using Microsoft.Identity.Web;
 global using Microsoft.Azure.Cosmos;
-global using DillonRPG.Common.DTOs;
+global using DillonRPG.Repository.Entities;
 global using TanvirArjel.EFCore.GenericRepository;
 global using Microsoft.Extensions.Caching.Memory;
 global using Microsoft.EntityFrameworkCore;

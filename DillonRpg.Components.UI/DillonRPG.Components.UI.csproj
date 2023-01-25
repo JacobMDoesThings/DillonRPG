@@ -17,4 +17,8 @@
     <PackageReference Include="Radzen.Blazor" Version="4.5.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DillonRPG.Service.Client\DillonRPG.Service.Client.csproj" />
+  </ItemGroup>
+
 </Project>

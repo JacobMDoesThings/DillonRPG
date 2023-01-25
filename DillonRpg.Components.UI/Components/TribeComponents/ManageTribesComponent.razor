@@ -1,0 +1,70 @@
+﻿<RadzenText Text="Manage Tribes" TextStyle="TextStyle.H3" />
+
+@{
+    if (_showCreateTribeComponent)
+    {
+            <CreateTribeComponent HideComponent="()=>_showCreateTribeComponent = false"
+            Abilities="Abilities"
+            Classes="Classes"
+            Families="Families"/>
+    }
+    else
+    {
+        <RadzenButton class="mb-3" Shade="Shade.Lighter" Click=@(() => _showCreateTribeComponent = true) Text="Create Tribe" ButtonStyle="ButtonStyle.Primary" />
+    }
+}
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="25" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@_tribes" TItem="Tribe" LogicalFilterOperator="LogicalFilterOperator.Or" @ref="_dataGrid">
+    <Columns>
+        <RadzenDataGridColumn TItem="Tribe" Property="@nameof(Tribe.TribeName)" Title="Tribe Name" Frozen="true" />
+        <RadzenDataGridColumn TItem="Tribe" Property="@nameof(Tribe.Ability)" Title="Ability" Frozen="true" />
+        <RadzenDataGridColumn TItem="Tribe" Property="@nameof(Tribe.Class)" Title="Class" Frozen="true" />
+        <RadzenDataGridColumn TItem="Tribe" Property="@nameof(Tribe.Family)" Title="Family" Frozen="true" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<Tribe>? _dataGrid = new();
+    private IEnumerable<Ability> _abilities = Enumerable.Empty<Ability>();
+    private IEnumerable<Class> _classes = Enumerable.Empty<Class>();
+    private IEnumerable<Family> _families = Enumerable.Empty<Family>();
+    
+    [Parameter]
+    public IEnumerable<Ability> Abilities 
+    {
+        get => _abilities;
+        set
+        {
+            _abilities = value;
+            _dataGrid?.Reload();
+        }
+    }
+
+    [Parameter]
+    public IEnumerable<Class> Classes
+    {
+        get => _classes;
+        set
+        {
+            _classes = value;
+            _dataGrid?.Reload();
+        }
+    }
+
+    [Parameter]
+    public IEnumerable<Family> Families
+    {
+        get => _families;
+        set
+        {
+            _families = value;
+            _dataGrid?.Reload();
+        }
+    }
+    private IEnumerable<Tribe> _tribes = Enumerable.Empty<Tribe>();
+    private bool _showCreateTribeComponent;
+    private void OnCreateTribeClick()
+    {
+
+    }
+}

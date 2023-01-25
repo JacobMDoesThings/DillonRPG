@@ -1,3 +1,4 @@
-﻿global using DillonRPG.Components.UI;
-global using static DillonRPG.Components.UI.Constants;
+﻿global using Microsoft.AspNetCore.Components;
+global using DillonRPG.Service.Client.DTOs;
+global using Radzen.Blazor;
 

@@ -1,5 +1,4 @@
 ﻿
-
 namespace DillonRPG.Web.Configuration;
 
 internal static class CompositionRoot
@@ -16,6 +15,7 @@ internal static class CompositionRoot
 
         services.ConfigureCaching();
         services.AddSingleton(settings.GraphApi!);
+        services.AddScoped<DialogService>();
         services.AddScoped<GraphApiClientService>();
         services.AddTransient<IClaimsTransformation, GraphApiClaimsTransformation>();
         services.AddSingleton(service => new DillonRPGService()
@@ -26,11 +26,6 @@ internal static class CompositionRoot
 
         services.AddHttpClient<ServiceClientCaller>(c => c.BaseAddress = settings.DillonRPGService!.BaseUrl);
 
-        //services.AddScoped<HttpContextAccessor>();
-        //services.AddRefitClient<IImagesClient>();
-        //services.AddScoped(x => settings.SMDemoApi!);
-        //services.AddScoped<ServiceClientCaller>();
-        //services.AddScoped<ImagesClient>();
         return services;
     }
 
@@ -55,7 +50,7 @@ internal static class CompositionRoot
         .EnableTokenAcquisitionToCallDownstreamApi()
         .AddDownstreamWebApi(nameof(settings.DillonRPGService), configuration.GetSection(nameof(settings.DillonRPGService)))
         .AddMicrosoftGraph(configuration.GetSection(nameof(settings.GraphApi)))
-        .AddDistributedTokenCaches();
+        .AddInMemoryTokenCaches();
 
         services.AddControllersWithViews(options =>
         {
@@ -108,7 +103,11 @@ internal static class CompositionRoot
     /// <returns>Configured ApiServices</returns>
     internal static IServiceCollection ConfigureApis(this IServiceCollection services)
     {
-        return services.AddScoped<IWeatherServiceClient, WeatherServiceClient>();
+        services.AddScoped<IAbilitiesServiceClient, AbilitiesServiceClient>();
+        services.AddScoped<IClassesServiceClient, ClassesServiceClient>();
+        services.AddScoped<IFamiliesServiceClient, FamiliesServiceClient>(); 
+        return services;
+        
     }
 
     internal static AppSettings BindSettings(this IConfigurationRoot configurationRoot)
@@ -117,7 +116,7 @@ internal static class CompositionRoot
 
         AppSettings settings = new()
         {
-            // AzureAdB2C = configuration.GetSection("AzureAdB2C").Get<AzureAdB2C>(),
+            // AzureAdB2C = configuration.GetSection("AzureAdB2C").GetAbilities<AzureAdB2C>(),
             GraphApi = configurationRoot.GetRequiredSection("GraphApi").Get<GraphApi>(),
             DillonRPGService = configurationRoot.GetSection("DillonRPGService").Get<DillonRPGService>(),
             SecurityGroups = configurationRoot.GetSection("SecurityGroups").Get<SecurityGroups>()
@@ -125,12 +124,4 @@ internal static class CompositionRoot
 
         return settings;
     }
-    private static IConfigurationRoot BuildConfiguration(this IConfigurationBuilder configurationBuilder)
-    {
-        return configurationBuilder
-            .AddJsonFile("appsettings.json", false, false)
-            .AddUserSecrets<Program>(optional: true)
-            .Build();
-    }
-
 }

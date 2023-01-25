@@ -1,0 +1,29 @@
+﻿<RadzenText Text="Manage Classes" TextStyle="TextStyle.H3" />
+
+@{
+    if (_showCreateClassComponent)
+    {
+        <CreateClassComponent HideComponent="()=>_showCreateClassComponent = false" />
+    }
+    else
+    {
+        <RadzenButton class="mb-3" Shade="Shade.Lighter" Click=@(() => _showCreateClassComponent = true) Text="Create Class" ButtonStyle="ButtonStyle.Primary" />
+    }
+}
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="25" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@Classes" TItem="Class" LogicalFilterOperator="LogicalFilterOperator.Or">
+    <Columns>
+        <RadzenDataGridColumn TItem="Class" Property="@nameof(Class.Name)" Title="Class Name" Frozen="true" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter]
+    public IEnumerable<Class> Classes { get; set; } = Enumerable.Empty<Class>();
+    private bool _showCreateClassComponent = true;
+    private void OnCreateClassClick()
+    {
+
+
+    }
+}

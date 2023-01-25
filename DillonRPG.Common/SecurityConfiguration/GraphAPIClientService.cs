@@ -54,11 +54,8 @@ public class GraphApiClientService
             .Request().PostAsync()
             .ConfigureAwait(false);
 
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
         _memoryCache.Set(cacheKey, result, _memoryCacheEntryOptions);
-        stopwatch.Stop();
-        _logger.LogInformation("Writing to catch took {stopwatch.ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
+
         return result;
     }
 }
