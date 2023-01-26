@@ -1,20 +1,17 @@
 ﻿namespace DillonRPG.Service.Client;
 
-public class AbilitiesServiceClient : ServiceClient, IAbilitiesServiceClient
+public class AbilitiesServiceClient : ServiceClient<IAbilitiesServiceClient>, IAbilitiesServiceClient
 {
-    public AbilitiesServiceClient(ServiceClientCaller client, 
+    public AbilitiesServiceClient(HttpClient client, 
         ITokenAcquisition tokenAcquistion, 
-        DillonRPGService service, 
-        ILogger<ServiceClient> logger) 
-        : base(client, tokenAcquistion, service, logger)
+        DillonRPGService service)
+        : base(tokenAcquistion, service, client)
     {
+ 
     }
 
     public async Task<ApiResponse<IEnumerable<Ability>>> GetAbilities()
     {
-        return await _client.GetClient<IAbilitiesServiceClient>(() =>
-        {
-            return _tokenAcquistion.GetAccessTokenForUserAsync(_service.Scope!).Result;
-        }).GetAbilities();
+        return await _serviceClient!.GetAbilities();
     }
 }

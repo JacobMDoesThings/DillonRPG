@@ -1,20 +1,23 @@
-﻿namespace DillonRPG.Service.Client;
+﻿using Microsoft.Extensions.Configuration.EnvironmentVariables;
 
-public class FamiliesServiceClient : ServiceClient, IFamiliesServiceClient
+namespace DillonRPG.Service.Client;
+
+public class FamiliesServiceClient : ServiceClient<IFamiliesServiceClient>, IFamiliesServiceClient
 {
 
-    public FamiliesServiceClient(ServiceClientCaller client,
+    public FamiliesServiceClient(HttpClient client,
     ITokenAcquisition tokenAcquistion,
-    DillonRPGService service,
-    ILogger<ServiceClient> logger)
-    : base(client, tokenAcquistion, service, logger)
+    DillonRPGService service)
+    : base(tokenAcquistion, service, client)
     {
+        _serviceClient = RestService.For<IFamiliesServiceClient>(
+         GetClientWithAuthHeader<IFamiliesServiceClient>(() =>
+         {
+             return _tokenAcquistion.GetAccessTokenForUserAsync(_service.Scope!).Result;
+         }));
     }
     public async Task<ApiResponse<IEnumerable<Family>>> GetFamilies()
     {
-        return await _client.GetClient<IFamiliesServiceClient>(() =>
-        {
-            return _tokenAcquistion.GetAccessTokenForUserAsync(_service.Scope!).Result;
-        }).GetFamilies();
+       return await _serviceClient!.GetFamilies();
     }
 }

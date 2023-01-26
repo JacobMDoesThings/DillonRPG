@@ -37,7 +37,7 @@ public static class ServiceClientExtensions
                 services.AddScoped<IDillonRPGServiceClient, DillonRPGServiceClient>();
                 break;
         }
-
+        
         return services;
     }
 }

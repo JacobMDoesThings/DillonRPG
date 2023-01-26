@@ -3,25 +3,24 @@ namespace DillonRPG.Service.Client;
 
 public class DillonRPGServiceClient : IDillonRPGServiceClient
 {
-    ServiceClientCaller _client;
+    readonly HttpClient _client;
     ITokenAcquisition _tokenAcquisition;
     DillonRPGService _service;
-    ILogger<ServiceClient> _logger;
 
-    public DillonRPGServiceClient(ServiceClientCaller client,
+    public DillonRPGServiceClient(HttpClient client,
        ITokenAcquisition tokenAcquistion,
-       DillonRPGService service,
-       ILogger<ServiceClient> logger)
+       DillonRPGService service)
     {
         _client = client;
         _tokenAcquisition = tokenAcquistion;
         _service = service;
-        _logger = logger;
+        
+        _client.BaseAddress = _service.BaseUrl;
     }
 
-    public IAbilitiesServiceClient AbilitiesServiceClient => new AbilitiesServiceClient(_client, _tokenAcquisition, _service, _logger);
+    public IAbilitiesServiceClient AbilitiesServiceClient => new AbilitiesServiceClient(_client, _tokenAcquisition, _service);
 
-    public IClassesServiceClient ClassesServiceClient => new ClassesServiceClient(_client, _tokenAcquisition, _service, _logger);
+    public IClassesServiceClient ClassesServiceClient => new ClassesServiceClient(_client, _tokenAcquisition, _service);
 
-    public IFamiliesServiceClient FamiliesServiceClient => new FamiliesServiceClient(_client, _tokenAcquisition, _service, _logger);
+    public IFamiliesServiceClient FamiliesServiceClient => new FamiliesServiceClient(_client, _tokenAcquisition, _service);
 }

@@ -14,7 +14,7 @@ internal static class CompositionRoot
         var settings = configuration.BindSettings();
 
         services
-            .AddDillonRPGServiceClient()
+
             .ConfigureCaching()
             .AddSingleton(settings.GraphApi!)
             .AddScoped<DialogService>()
@@ -24,10 +24,9 @@ internal static class CompositionRoot
             {
                 Scope = settings.DillonRPGService!.Scope,
                 BaseUrl = settings.DillonRPGService.BaseUrl
-            })
+            });
 
-        .AddHttpClient<ServiceClientCaller>(c => c.BaseAddress = settings.DillonRPGService!.BaseUrl);
-
+            services.AddDillonRPGServiceClient();
         return services;
     }
 

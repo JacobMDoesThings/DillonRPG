@@ -1,20 +1,16 @@
 ﻿namespace DillonRPG.Service.Client;
 
-public class ClassesServiceClient : ServiceClient, IClassesServiceClient
+public class ClassesServiceClient : ServiceClient<IClassesServiceClient>, IClassesServiceClient
 {
-    public ClassesServiceClient(ServiceClientCaller client,
+    public ClassesServiceClient(HttpClient client,
     ITokenAcquisition tokenAcquistion,
-    DillonRPGService service,
-    ILogger<ServiceClient> logger)
-    : base(client, tokenAcquistion, service, logger)
+    DillonRPGService service)
+    : base(tokenAcquistion, service, client)
     {
     }
 
     public async Task<ApiResponse<IEnumerable<Class>>> GetClasses()
     {
-        return await _client.GetClient<IClassesServiceClient>(() =>
-        {
-            return _tokenAcquistion.GetAccessTokenForUserAsync(_service.Scope!).Result;
-        }).GetClasses();
+        return await _serviceClient!.GetClasses();
     }
 }
