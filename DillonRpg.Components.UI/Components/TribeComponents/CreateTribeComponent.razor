@@ -1,13 +1,14 @@
-﻿
-@inject DialogService DialogService
+﻿@inject DialogService DialogService
 <RadzenText TextStyle="TextStyle.H6" Text="Create Tribe" />
 
-<div class="row mb-2">
-    <div class="col">
+<div class="row mb-5">
+    <div class="col mb-3">
         <RadzenLabel Text="Enter Tribe Name" />
-        <RadzenTextBox />
+        <div>
+            <RadzenTextBox />
+        </div>
     </div>
-    <div class="col">
+    <div class="col mb-3">
         <DropDownWithCreateButtonComponent TValue="string"
                                            Data="Abilities"
                                            TextProperty="Name"
@@ -17,7 +18,7 @@
                                            ButtonClick="OpenManageAbilities" />
     </div>
 
-    <div class="col">
+    <div class="col mb-3">
         <DropDownWithCreateButtonComponent TValue="string"
                                            Data="Classes"
                                            TextProperty="Name"
@@ -26,14 +27,14 @@
                                            LabelText="Select Class"
                                            ButtonClick="OpenManageClasses" />
     </div>
-    <div class="col">
+    <div class="col mb-3">
         <DropDownWithCreateButtonComponent TValue="string"
                                            Data="Families"
                                            TextProperty="Name"
                                            ValueProperty="Id"
                                            BindValue="_selectedFamily!.Name"
-                                           LabelText="Select Family" 
-                                           ButtonClick="OpenManageFamilies"/>
+                                           LabelText="Select Family"
+                                           ButtonClick="OpenManageFamilies" />
     </div>
 </div>
 <div class="mb-3">
