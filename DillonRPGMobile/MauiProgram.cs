@@ -39,7 +39,7 @@ public static class MauiProgram
         builder.Services.AddScoped<AuthStateProvider>();
         builder.Services.AddScoped<AuthenticationStateProvider>(s => s.GetRequiredService<AuthStateProvider>());
         builder.Services.AddScoped<IAccountManager>(s => s.GetRequiredService<AuthStateProvider>());
-        builder.Services.AddHttpClient<ServiceClientCaller>(c => c.BaseAddress = new Uri(BaseAddress));
+        //builder.Services.AddHttpClient<ServiceClientCaller>(c => c.BaseAddress = new Uri(BaseAddress));
         builder.Services.AddScoped<DialogService>();
         builder.Services.AddScoped<TooltipService>();
         return builder.Build();

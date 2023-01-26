@@ -13,4 +13,9 @@ public class ClassesServiceClient : ServiceClient<IClassesServiceClient>, IClass
     {
         return await _serviceClient!.GetClasses();
     }
+
+    public async Task<ApiResponse<Class>> PostClass(Class classEntity)
+    {
+        return await _serviceClient!.PostClass(classEntity);
+    }
 }

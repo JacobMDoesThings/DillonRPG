@@ -9,19 +9,15 @@ public class FamiliesServiceClient : ServiceClient<IFamiliesServiceClient>, IFam
     DillonRPGService service)
     : base(tokenAcquistion, service, client)
     {
-        _serviceClient = RestService.For<IFamiliesServiceClient>(
-         GetClientWithAuthHeader<IFamiliesServiceClient>(() =>
-         {
-             return _tokenAcquistion.GetAccessTokenForUserAsync(_service.Scope!).Result;
-         }));
     }
+    
     public async Task<ApiResponse<IEnumerable<Family>>> GetFamilies()
     {
        return await _serviceClient!.GetFamilies();
     }
 
-    public async Task<ApiResponse<Family>> PutFamily(Family family)
+    public async Task<ApiResponse<Family>> PostFamily(Family family)
     {
-        return await _serviceClient!.PutFamily(family);
+        return await _serviceClient!.PostFamily(family);
     }
 }

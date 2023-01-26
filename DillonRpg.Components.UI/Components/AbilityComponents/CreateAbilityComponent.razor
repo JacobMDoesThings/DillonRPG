@@ -1,18 +1,39 @@
-﻿<RadzenText TextStyle="TextStyle.H6" Text="Create Ability" />
+﻿@inject IDillonRPGServiceClient _client;
+@inject ILogger<CreateAbilityComponent> _logger;
+
+<RadzenText TextStyle="TextStyle.H6" Text="Create Ability" />
 
 <div class="row mb-2">
     <div class="col">
         <RadzenLabel Text="Enter Ability Name" />
-        <RadzenTextBox />
+         <RadzenTextBox @bind-Value="_abilityName" />
     </div>
 </div>
 
 <div class="mb-3">
-    <RadzenButton class="me-2" Click=@(HideComponent) Text="Create" ButtonStyle="ButtonStyle.Primary" />
+    <RadzenButton class="me-2" Click="CreateAbility" Text=" Create" ButtonStyle="ButtonStyle.Primary" />
     <RadzenButton Click=@(HideComponent) Text="Cancel" ButtonStyle="ButtonStyle.Secondary" />
 </div>
 
 @code {
+    private string _abilityName = string.Empty;
     [Parameter]
     public EventCallback HideComponent { get; set; }
+
+    private async Task CreateAbility()
+    {
+        Ability ability = new()
+            {
+                Name = _abilityName
+            };
+
+        await _client.AbilitiesServiceClient.PostAbility(ability).HandleResults<Ability>(success: (result) =>
+        {
+            Ability? res = result?.Content;
+        },
+        failure: (result) =>
+        {
+            result.Error!.LogFailure(_logger, nameof(AbilitiesServiceClient.PostAbility));
+        });
+    }
 }

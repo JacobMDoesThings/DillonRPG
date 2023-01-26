@@ -27,13 +27,13 @@
             Name = _familyName
         };
 
-        await _client.FamiliesServiceClient.PutFamily(family).HandleResults<Family>(success: (result) =>
+        await _client.FamiliesServiceClient.PostFamily(family).HandleResults<Family>(success: (result) =>
         {
             Family? res = result?.Content;
         },
         failure: (result) =>
         {
-            result.Error!.LogFailure(_logger, nameof(AbilitiesServiceClient.GetAbilities));
+            result.Error!.LogFailure(_logger, nameof(FamiliesServiceClient.PostFamily));
         });
     }
 }

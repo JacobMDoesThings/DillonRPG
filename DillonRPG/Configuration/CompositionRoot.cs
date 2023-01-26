@@ -45,9 +45,9 @@ internal static class CompositionRoot
                     settings.SecurityGroups!.Test.SecurityGroupId!));
             });
 
-            options.DefaultPolicy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
+            //options.DefaultPolicy = new AuthorizationPolicyBuilder()
+            //  .RequireAuthenticatedUser()
+            //    .Build();
         });
 
         return services;

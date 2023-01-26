@@ -7,5 +7,5 @@ public interface IFamiliesServiceClient : IServiceClient
     public Task<ApiResponse<IEnumerable<Family>>> GetFamilies();
 
     [Post("/Families")]
-    public Task<ApiResponse<Family>> PutFamily(Family family);
+    public Task<ApiResponse<Family>> PostFamily(Family family);
 }

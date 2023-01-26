@@ -1,37 +1,24 @@
 ﻿
 namespace DillonRPG.Service.Controllers;
 
-[Authorize]
-[ApiController]
-[Route("[controller]")]
-public class AbilitiesController : ControllerBase
+
+public class AbilitiesController : BaseController
 {
-    [Authorize(Policy = "GodModePolicy")]
-    [HttpGet(Name = "GetAbilities")]
-    public ActionResult<IEnumerable<AbilityEntity>> Get()
+    public AbilitiesController(DillonRPGContext context, ILogger<BaseController> logger)
+    : base(context, logger)
     {
-        return new AbilityEntity[]
-        {
-            new AbilityEntity()
-            {
-                Name = "Ability 1",
-                Id = "1"
-            },
-                new AbilityEntity()
-            {
-                Name = "Ability 2",
-                Id = "2"
-            },
-                new AbilityEntity()
-            {
-                Name = "Ability 3",
-                Id = "3"
-            },
-                new AbilityEntity()
-            {
-                Name = "Ability 4",
-                Id = "4"
-            }
-        };
+    }
+    [Authorize(Policy = "GodModePolicy")]
+    [HttpGet]
+    public async Task<IActionResult> Get()
+    {
+        return await GetEntitiesAsync<AbilityEntity>().ConfigureAwait(false);
+    }
+
+    [Authorize(Policy = "GodModePolicy")]
+    [HttpPost]
+    public async Task<IActionResult> Post(AbilityEntity entity)
+    {
+        return (await PostEntityAsync(entity).ConfigureAwait(false)).ActionResult;
     }
 }

@@ -7,11 +7,16 @@ public class AbilitiesServiceClient : ServiceClient<IAbilitiesServiceClient>, IA
         DillonRPGService service)
         : base(tokenAcquistion, service, client)
     {
- 
+
     }
 
     public async Task<ApiResponse<IEnumerable<Ability>>> GetAbilities()
     {
         return await _serviceClient!.GetAbilities();
+    }
+
+    public async Task<ApiResponse<Ability>> PostAbility(Ability ability)
+    {
+        return await _serviceClient!.PostAbility(ability);
     }
 }

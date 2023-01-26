@@ -3,7 +3,7 @@ namespace DillonRPG.Repository.Entities;
 
 public class FamilyEntity : BaseEntity
 {
-    private const string DocumentType = nameof(AbilityEntity);
+    private const string DocumentType = nameof(FamilyEntity);
 
     /// <summary>
     /// Gets the DocumentType.
