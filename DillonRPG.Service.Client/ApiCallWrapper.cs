@@ -1,7 +1,5 @@
 ﻿
-using System.Runtime.CompilerServices;
-
-namespace DillonRPG.Web.Data;
+namespace DillonRPG.Service.Client;
 
 /// <summary>
 /// Extension methods for handling the Api for this web application.

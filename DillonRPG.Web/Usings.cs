@@ -4,7 +4,6 @@ global using Microsoft.AspNetCore.Mvc.Authorization;
 global using System.IdentityModel.Tokens.Jwt;
 global using Microsoft.Identity.Web;
 global using Microsoft.Identity.Web.UI;
-global using DillonRPG.Web.Data;
 global using DillonRPG.Service.Client.DTOs;
 global using DillonRPG.Service.Client;
 global using Microsoft.AspNetCore.Authentication;

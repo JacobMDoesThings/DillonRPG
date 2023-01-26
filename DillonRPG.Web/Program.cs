@@ -3,7 +3,6 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 builder.Services.ConfigureServices(configuration);
 builder.Services.ConfigureSecurity(configuration);
-builder.Services.ConfigureApis();
 
 var app = builder.Build();
 

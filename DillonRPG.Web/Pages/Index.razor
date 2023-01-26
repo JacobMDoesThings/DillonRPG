@@ -1,7 +1,5 @@
 ﻿@page "/"
-@inject IAbilitiesServiceClient _abilitiesClient;
-@inject IClassesServiceClient _classesClient;
-@inject IFamiliesServiceClient _familiesClient;
+@inject IDillonRPGServiceClient _dillonClient;
 @inject ILogger<Index> _logger;
 @inject SecurityGroups _sg;
 
@@ -15,7 +13,6 @@
 </AuthorizeView>
 
 @code {
-    IEnumerable<WeatherForecast>? forecasts;
     private IEnumerable<Ability>? _abilities = Enumerable.Empty<Ability>();
     private IEnumerable<Class>? _classes = Enumerable.Empty<Class>();
     private IEnumerable<Family>? _families = Enumerable.Empty<Family>();
@@ -54,7 +51,7 @@
     {
         if (firstRender)
         {
-            var getAbilities = _abilitiesClient.GetAbilities().HandleResults<IEnumerable<Ability>>(success: (result) =>
+            var getAbilities = _dillonClient.AbilitiesServiceClient.GetAbilities().HandleResults<IEnumerable<Ability>>(success: (result) =>
            {
                abilities = result.Content;
            },
@@ -63,7 +60,7 @@
                result.Error!.LogFailure(_logger, nameof(AbilitiesServiceClient.GetAbilities));
            });
 
-            var getClasses = _classesClient.GetClasses().HandleResults<IEnumerable<Class>>(success: (result) =>
+            var getClasses = _dillonClient.ClassesServiceClient.GetClasses().HandleResults<IEnumerable<Class>>(success: (result) =>
            {
                classes = result.Content;
            },
@@ -72,7 +69,7 @@
                result.Error!.LogFailure(_logger, nameof(ClassesServiceClient.GetClasses));
            });
 
-            var getFamilies = _familiesClient.GetFamilies().HandleResults<IEnumerable<Family>>(success: (result) =>
+            var getFamilies = _dillonClient.FamiliesServiceClient.GetFamilies().HandleResults<IEnumerable<Family>>(success: (result) =>
             {
                 families = result.Content;
             },
