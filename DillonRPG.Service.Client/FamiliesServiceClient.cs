@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration.EnvironmentVariables;
-
+﻿
 namespace DillonRPG.Service.Client;
 
 public class FamiliesServiceClient : ServiceClient<IFamiliesServiceClient>, IFamiliesServiceClient
@@ -19,5 +18,10 @@ public class FamiliesServiceClient : ServiceClient<IFamiliesServiceClient>, IFam
     public async Task<ApiResponse<IEnumerable<Family>>> GetFamilies()
     {
        return await _serviceClient!.GetFamilies();
+    }
+
+    public async Task<ApiResponse<Family>> PutFamily(Family family)
+    {
+        return await _serviceClient!.PutFamily(family);
     }
 }

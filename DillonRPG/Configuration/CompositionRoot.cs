@@ -16,12 +16,8 @@ internal static class CompositionRoot
         services.AddScoped<GraphApiClientService>();
         services.AddTransient<IClaimsTransformation, GraphApiClaimsTransformation>();
         services.AddCosmosClient(settings.CosmosRepositoryOptions);
-        services.AddQueryRepository<DillonRPGContext>();
-        services.AddGenericRepository<DillonRPGContext>();
-
-
+        services.AddDbContext<DillonRPGContext>();
         return services;
-
     }
 
 
