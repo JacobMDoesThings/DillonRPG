@@ -1,5 +1,4 @@
-﻿
-namespace DillonRPG.Service.Controllers;
+﻿namespace DillonRPG.Service.Controllers;
 
 
 public class AbilitiesController : BaseController
@@ -20,5 +19,12 @@ public class AbilitiesController : BaseController
     public async Task<IActionResult> Post(AbilityEntity entity)
     {
         return (await PostEntityAsync(entity).ConfigureAwait(false)).ActionResult;
+    }
+
+    [Authorize(Policy = "GodModePolicy")]
+    [HttpDelete]
+    public async Task<IActionResult> Delete(AbilityEntity entity)
+    {
+        return await DeleteEntityAsync<AbilityEntity>(entity).ConfigureAwait(false);
     }
 }

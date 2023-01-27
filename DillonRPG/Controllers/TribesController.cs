@@ -1,8 +1,8 @@
 ﻿namespace DillonRPG.Service.Controllers;
 
-public class ClassesController : BaseController
+public class TribesController : BaseController
 {
-    public ClassesController(DillonRPGContext context, ILogger<BaseController> logger)
+    public TribesController(DillonRPGContext context, ILogger<BaseController> logger)
     : base(context, logger)
     {
     }
@@ -11,12 +11,12 @@ public class ClassesController : BaseController
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        return await GetEntitiesAsync<ClassEntity>().ConfigureAwait(false);
+        return await GetEntitiesAsync<TribeEntity>().ConfigureAwait(false);
     }
 
     [Authorize(Policy = "GodModePolicy")]
     [HttpPost]
-    public async Task<IActionResult> Post(ClassEntity entity)
+    public async Task<IActionResult> Post(TribeEntity entity)
     {
         return (await PostEntityAsync(entity).ConfigureAwait(false)).ActionResult;
     }

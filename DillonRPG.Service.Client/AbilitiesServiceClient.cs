@@ -19,4 +19,9 @@ public class AbilitiesServiceClient : ServiceClient<IAbilitiesServiceClient>, IA
     {
         return await _serviceClient!.PostAbility(ability);
     }
+
+    public async Task<ApiResponse<Ability>> DeleteAbility(Ability ability)
+    {
+        return await _serviceClient!.DeleteAbility(ability);
+    }
 }

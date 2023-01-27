@@ -32,7 +32,7 @@ public class TribeEntity : BaseEntity
     /// <summary>
     /// gets or sets the  TribeAbility.
     /// </summary>
-    public AbilityEntity? TribeAbility { get; set; }
+    public AbilityEntity? Ability { get; set; }
 
     /// <summary>
     /// gets or sets the Class.

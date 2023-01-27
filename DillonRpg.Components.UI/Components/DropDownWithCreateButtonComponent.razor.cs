@@ -1,23 +1,18 @@
 ﻿
 namespace DillonRPG.Components.UI.Components;
 
-public partial class DropDownWithCreateButtonComponent<TValue>
+public partial class DropDownWithCreateButtonComponent
 {
     [Parameter]
     public EventCallback ButtonClick { get; set; }
 
     [Parameter]
-    public string LabelText { get; set; } = typeof(TValue).ToString();
+    public EventCallback<object> OnChange { get; set; }
+
+    [Parameter]
+    public string LabelText { get; set; } = string.Empty;
 
     [Parameter]
     public IEnumerable<object> Data { get; set; } = Enumerable.Empty<object>();
 
-    [Parameter]
-    public TValue? BindValue { get; set; }
-
-    [Parameter]
-    public string? TextProperty { get; set; }
-
-    [Parameter]
-    public string? ValueProperty { get; set; }
 }

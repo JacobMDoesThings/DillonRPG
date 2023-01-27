@@ -80,9 +80,38 @@ public class BaseController : ControllerBase
         }
     }
 
+    protected virtual async Task<IActionResult> DeleteEntityAsync<T>(T entity)
+       where T : BaseEntity
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+           // var entity =  await _context.Set<T>().FirstAsync(e => e.Id == key);
+            //_context.Attach(entity);
+            _context.Remove(entity);
+            _context.SaveChanges();
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Error encountered on getting records for entity  of type {type} from database. {exception}", typeof(T).Name, ex);
+            return StatusCode(500);
+        }
+    }
+
     protected virtual async Task<(IActionResult ActionResult, bool IsSuccess)> PostEntityAsync<T>(T entity, bool returnIdOnly = false)
        where T : BaseEntity
     {
+        _context.Attach(entity);
          if (!ModelState.IsValid)
          {
              return (BadRequest(ModelState), default);
@@ -127,6 +156,7 @@ public class BaseController : ControllerBase
 
         return (Ok(entityEntry.Entity), true);
     }
+
     /// <summary>
     /// Unexpected the server error.
     /// </summary>

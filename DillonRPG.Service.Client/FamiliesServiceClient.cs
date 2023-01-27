@@ -13,11 +13,11 @@ public class FamiliesServiceClient : ServiceClient<IFamiliesServiceClient>, IFam
     
     public async Task<ApiResponse<IEnumerable<Family>>> GetFamilies()
     {
-       return await _serviceClient!.GetFamilies();
+       return await _serviceClient!.GetFamilies().ConfigureAwait(false);
     }
 
     public async Task<ApiResponse<Family>> PostFamily(Family family)
     {
-        return await _serviceClient!.PostFamily(family);
+        return await _serviceClient!.PostFamily(family).ConfigureAwait(false);
     }
 }

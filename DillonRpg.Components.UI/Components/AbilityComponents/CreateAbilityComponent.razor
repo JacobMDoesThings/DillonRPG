@@ -11,8 +11,7 @@
 </div>
 
 <div class="mb-3">
-    <RadzenButton class="me-2" Click="CreateAbility" Text=" Create" ButtonStyle="ButtonStyle.Primary" />
-    <RadzenButton Click=@(HideComponent) Text="Cancel" ButtonStyle="ButtonStyle.Secondary" />
+    <RadzenButton class="me-2" Click="CreateAbility" Text="Create" ButtonStyle="ButtonStyle.Primary" />
 </div>
 
 @code {
@@ -23,9 +22,9 @@
     private async Task CreateAbility()
     {
         Ability ability = new()
-            {
-                Name = _abilityName
-            };
+        {
+            Name = _abilityName
+        };
 
         await _client.AbilitiesServiceClient.PostAbility(ability).HandleResults<Ability>(success: (result) =>
         {

@@ -18,6 +18,14 @@ public class DillonRPGContext : DbContext
         _entityTypeBuilder.Property(x => x.Name);
     };
 
+    private readonly Action<EntityTypeBuilder<TribeEntity>> _configureTribeEntity = (_entityTypeBuilder) =>
+    {
+        _entityTypeBuilder.Property(x => x.TribeName);
+        _entityTypeBuilder.HasOne(x => x.Ability).WithMany();
+        _entityTypeBuilder.HasOne(x => x.Class).WithMany();
+        _entityTypeBuilder.HasOne(x => x.Family).WithMany();
+    };
+
     public DillonRPGContext(DbContextOptions options)
         : base(options)
     { 
@@ -31,6 +39,7 @@ public class DillonRPGContext : DbContext
         modelBuilder
             .ConfigureEntityDefault("abilities", _configureAbilityEntitity)
             .ConfigureEntityDefault("families", _configureFamilyEntity)
-            .ConfigureEntityDefault("classes", _configureClassEntity);
+            .ConfigureEntityDefault("classes", _configureClassEntity)
+            .ConfigureEntityDefault("tribes", _configureTribeEntity);
     }
 }

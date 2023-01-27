@@ -8,4 +8,8 @@ public interface IAbilitiesServiceClient : IServiceClient
 
     [Post("/Abilities")]
     public Task<ApiResponse<Ability>> PostAbility(Ability ability);
+
+
+    [Post("/Abilities")]
+    public Task<ApiResponse<Ability>> DeleteAbility(Ability ability);
 }

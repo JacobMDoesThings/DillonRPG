@@ -23,6 +23,7 @@ public class AbilityEntity : BaseEntity
         set { }
     }
 
+
     /// <summary>
     /// Gets or sets the Name.
     /// </summary>

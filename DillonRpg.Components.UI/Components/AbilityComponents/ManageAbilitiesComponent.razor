@@ -1,16 +1,23 @@
-﻿<RadzenText Text="Manage Abilities" TextStyle="TextStyle.H3" />
+﻿@inject IDillonRPGServiceClient _client;
+@inject ILogger<ManageAbilitiesComponent> _logger;
+
+<RadzenText Text="Manage Abilities" TextStyle="TextStyle.H3" />
 
 @{
     if (_showCreateAbilityComponent)
     {
-            <CreateAbilityComponent HideComponent="()=>_showCreateAbilityComponent = false"/>
+        <CreateAbilityComponent HideComponent="()=>_showCreateAbilityComponent = false" />
     }
     else
     {
         <RadzenButton class="mb-3" Shade="Shade.Lighter" Click=@(() => _showCreateAbilityComponent = true) Text="Create Ability" ButtonStyle="ButtonStyle.Primary" />
     }
+
+    <RadzenButton class="me-2" Click="DeleteAbility" Text="Delete" ButtonStyle="ButtonStyle.Primary" />
 }
-<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="25" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced"
+                SelectionMode="DataGridSelectionMode.Single" @bind-Value="_selectedAbilities" AllowSorting="true" PageSize="25" AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                 Data="@Abilities" TItem="Ability" LogicalFilterOperator="LogicalFilterOperator.Or">
     <Columns>
         <RadzenDataGridColumn TItem="Ability" Property="@nameof(Ability.Name)" Title="Ability Name" Frozen="true" />
@@ -18,12 +25,25 @@
 </RadzenDataGrid>
 
 @code {
+    private IList<Ability>? _selectedAbilities;
+
     [Parameter]
     public IEnumerable<Ability> Abilities { get; set; } = Enumerable.Empty<Ability>();
     private bool _showCreateAbilityComponent = true;
-    private void OnCreateAbilityClick()
+
+    private async Task DeleteAbility()
     {
-
-
+        var ability = _selectedAbilities?.FirstOrDefault();
+        if (ability is not null)
+        {
+            await _client.AbilitiesServiceClient.DeleteAbility(ability).HandleResults<Ability>(success: (result) =>
+            {
+                var res = result.Content;
+            },
+            failure: (result) =>
+            {
+                result.Error!.LogFailure(_logger, nameof(AbilitiesServiceClient.DeleteAbility));
+            });
+        }
     }
 }
