@@ -8,4 +8,7 @@ public interface IFamiliesServiceClient : IServiceClient
 
     [Post("/Families")]
     public Task<ApiResponse<Family>> PostFamily(Family family);
+
+    [Delete("/Families")]
+    public Task<ApiResponse<Family>> DeleteFamily(string id);
 }

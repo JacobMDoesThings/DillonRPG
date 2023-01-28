@@ -10,7 +10,12 @@ public class FamiliesServiceClient : ServiceClient<IFamiliesServiceClient>, IFam
     : base(tokenAcquistion, service, client)
     {
     }
-    
+
+    public async Task<ApiResponse<Family>> DeleteFamily(string id)
+    {
+        return await _serviceClient!.DeleteFamily(id).ConfigureAwait(false);
+    }
+
     public async Task<ApiResponse<IEnumerable<Family>>> GetFamilies()
     {
        return await _serviceClient!.GetFamilies().ConfigureAwait(false);

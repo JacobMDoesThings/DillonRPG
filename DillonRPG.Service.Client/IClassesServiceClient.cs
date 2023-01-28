@@ -9,4 +9,7 @@ public interface IClassesServiceClient : IServiceClient
 
     [Post("/Classes")]
     public Task<ApiResponse<Class>> PostClass(Class classEntity);
+
+    [Delete("/Classes")]
+    public Task<ApiResponse<Class>> DeleteClass(string id);
 }

@@ -10,9 +10,9 @@ namespace DillonRPG.Service.Controllers;
 public class BaseController : ControllerBase
 {
     private protected readonly DbContext _context;
-    private ILogger<BaseController> _logger;
+    protected ILogger _logger { get; }
 
-    public BaseController(DillonRPGContext context, ILogger<BaseController> logger)
+    public BaseController(DillonRPGContext context, ILogger logger)
     {
         _context = context;
         _logger = logger;
@@ -80,25 +80,19 @@ public class BaseController : ControllerBase
         }
     }
 
-    protected virtual async Task<IActionResult> DeleteEntityAsync<T>(T entity)
+    protected virtual async Task<IActionResult> DeleteEntityAsync<T>(string id)
        where T : BaseEntity
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
         try
         {
-           // var entity =  await _context.Set<T>().FirstAsync(e => e.Id == key);
-            //_context.Attach(entity);
-            _context.Remove(entity);
-            _context.SaveChanges();
-            if (entity == null)
+            var entity = await _context.FindAsync<T>(id);
+        
+            if (entity is null)
             {
                 return NotFound();
             }
-
+            _context.Remove(entity);
+            _context.SaveChanges();
             return Ok();
         }
         catch (Exception ex)

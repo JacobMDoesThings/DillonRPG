@@ -15,7 +15,7 @@ public class ClassEntity : BaseEntity
     }
 
     /// <summary>
-    /// Gets the PartitionKey for Ability by Name.
+    /// Gets the PartitionKey for Class by Name.
     /// </summary>
     public override string? PartitionKey
     {
@@ -30,9 +30,9 @@ public class ClassEntity : BaseEntity
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets the PartitionKey, the name of the ability.
+    /// Gets the PartitionKey, the name of the Class.
     /// </summary>
-    /// <param name="name">The name of the ability.</param>
+    /// <param name="name">The name of the Class.</param>
     /// <returns></returns>
     internal static string GetPartitionKey(string name) => $"{name}".ToLowerInvariant();
 }

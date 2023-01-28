@@ -13,7 +13,7 @@
         <RadzenButton class="mb-3" Shade="Shade.Lighter" Click=@(() => _showCreateAbilityComponent = true) Text="Create Ability" ButtonStyle="ButtonStyle.Primary" />
     }
 
-    <RadzenButton class="me-2" Click="DeleteAbility" Text="Delete" ButtonStyle="ButtonStyle.Primary" />
+    <RadzenButton class="me-2" Click="DeleteAbility" Text="Delete" ButtonStyle="ButtonStyle.Warning" />
 }
 <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced"
                 SelectionMode="DataGridSelectionMode.Single" @bind-Value="_selectedAbilities" AllowSorting="true" PageSize="25" AllowPaging="true"
@@ -36,14 +36,17 @@
         var ability = _selectedAbilities?.FirstOrDefault();
         if (ability is not null)
         {
-            await _client.AbilitiesServiceClient.DeleteAbility(ability).HandleResults<Ability>(success: (result) =>
+            if (!string.IsNullOrEmpty(ability.Id))
             {
-                var res = result.Content;
-            },
-            failure: (result) =>
-            {
-                result.Error!.LogFailure(_logger, nameof(AbilitiesServiceClient.DeleteAbility));
-            });
+                await _client.AbilitiesServiceClient.DeleteAbility(ability.Id).HandleResults<Ability>(success: (result) =>
+                {
+                    var res = result.Content;
+                },
+                failure: (result) =>
+                {
+                    result.Error!.LogFailure(_logger, nameof(AbilitiesServiceClient.DeleteAbility));
+                });
+            }
         }
     }
 }

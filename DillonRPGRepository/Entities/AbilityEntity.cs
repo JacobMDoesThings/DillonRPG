@@ -23,7 +23,6 @@ public class AbilityEntity : BaseEntity
         set { }
     }
 
-
     /// <summary>
     /// Gets or sets the Name.
     /// </summary>
@@ -36,5 +35,4 @@ public class AbilityEntity : BaseEntity
     /// <param name="name">The name of the ability.</param>
     /// <returns></returns>
     internal static string GetPartitionKey(string name) => $"{name}".ToLowerInvariant();
-
 }

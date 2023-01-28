@@ -29,7 +29,6 @@ public class DillonRPGContext : DbContext
     public DillonRPGContext(DbContextOptions options)
         : base(options)
     { 
-        ChangeTracker.LazyLoadingEnabled = true;
         ChangeTracker.AutoDetectChangesEnabled = true;
         ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
     }

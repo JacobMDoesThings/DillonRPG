@@ -10,6 +10,6 @@ public interface IAbilitiesServiceClient : IServiceClient
     public Task<ApiResponse<Ability>> PostAbility(Ability ability);
 
 
-    [Post("/Abilities")]
-    public Task<ApiResponse<Ability>> DeleteAbility(Ability ability);
+    [Delete("/Abilities")]
+    public Task<ApiResponse<Ability>> DeleteAbility(string id);
 }

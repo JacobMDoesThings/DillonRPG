@@ -1,12 +1,15 @@
-﻿<RadzenText Text="Manage Tribes" TextStyle="TextStyle.H3" />
+﻿@inject IDillonRPGServiceClient _client;
+@inject ILogger<ManageTribesComponent> _logger;
+
+<RadzenText Text="Manage Tribes" TextStyle="TextStyle.H3" />
 
 @{
     if (_showCreateTribeComponent)
     {
-            <CreateTribeComponent HideComponent="()=>_showCreateTribeComponent = false"
-            Abilities="Abilities"
-            Classes="Classes"
-            Families="Families"/>
+        <CreateTribeComponent HideComponent="()=>_showCreateTribeComponent = false"
+                      Abilities="Abilities"
+                      Classes="Classes"
+                      Families="Families" />
     }
     else
     {
@@ -14,29 +17,53 @@
     }
 }
 <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="25" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
-                Data="@_tribes" TItem="Tribe" LogicalFilterOperator="LogicalFilterOperator.Or" @ref="_dataGrid">
+                Data="tribes" TItem="Tribe" LogicalFilterOperator="LogicalFilterOperator.Or" @ref="_dataGrid">
     <Columns>
-        <RadzenDataGridColumn TItem="Tribe" Property="@nameof(Tribe.TribeName)" Title="Tribe Name" Frozen="true" />
-        <RadzenDataGridColumn TItem="Tribe" Property="@nameof(Tribe.Ability)" Title="Ability" Frozen="true" />
-        <RadzenDataGridColumn TItem="Tribe" Property="@nameof(Tribe.Class)" Title="Class" Frozen="true" />
-        <RadzenDataGridColumn TItem="Tribe" Property="@nameof(Tribe.Family)" Title="Family" Frozen="true" />
+        <RadzenDataGridColumn TItem="Tribe" Property="@nameof(Tribe.TribeName)" Title="Tribe Name" />
+        <RadzenDataGridColumn TItem="Tribe" Property="@nameof(Tribe.Ability)" Title="Ability">
+            <Template Context="abilityContext">
+                @abilityContext?.Ability?.Name
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Tribe" Property="@nameof(Tribe.Class)" Title="Class">
+            <Template Context="classContext">
+                @classContext?.Class?.Name
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Tribe" Property="@nameof(Tribe.Family)" Title="Family">
+            <Template Context="familyContext">
+                @familyContext?.Family?.Name
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
 @code {
     RadzenDataGrid<Tribe>? _dataGrid = new();
+    private IEnumerable<Tribe> _tribes = Enumerable.Empty<Tribe>();
+    private IEnumerable<Tribe> tribes
+    {
+        get => _tribes;
+        set
+        {
+            _tribes = value;
+            _dataGrid?.Reload();
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private bool _showCreateTribeComponent;
     private IEnumerable<Ability> _abilities = Enumerable.Empty<Ability>();
     private IEnumerable<Class> _classes = Enumerable.Empty<Class>();
     private IEnumerable<Family> _families = Enumerable.Empty<Family>();
-    
+
     [Parameter]
-    public IEnumerable<Ability> Abilities 
+    public IEnumerable<Ability> Abilities
     {
         get => _abilities;
         set
         {
             _abilities = value;
-            _dataGrid?.Reload();
         }
     }
 
@@ -47,7 +74,6 @@
         set
         {
             _classes = value;
-            _dataGrid?.Reload();
         }
     }
 
@@ -58,11 +84,26 @@
         set
         {
             _families = value;
-            _dataGrid?.Reload();
         }
     }
-    private IEnumerable<Tribe> _tribes = Enumerable.Empty<Tribe>();
-    private bool _showCreateTribeComponent;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await _client.TribesServiceClient.GetTribes().HandleResults<IEnumerable<Tribe>>(success: (result) =>
+            {
+                tribes = result?.Content ?? Enumerable.Empty<Tribe>();
+            },
+            failure: (result) =>
+            {
+                result.Error!.LogFailure(_logger, nameof(TribeServiceClient.GetTribes));
+            });
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
     private void OnCreateTribeClick()
     {
 

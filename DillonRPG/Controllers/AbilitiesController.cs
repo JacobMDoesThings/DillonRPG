@@ -1,9 +1,10 @@
-﻿namespace DillonRPG.Service.Controllers;
+﻿
+namespace DillonRPG.Service.Controllers;
 
 
 public class AbilitiesController : BaseController
 {
-    public AbilitiesController(DillonRPGContext context, ILogger<BaseController> logger)
+    public AbilitiesController(DillonRPGContext context, ILogger<AbilitiesController> logger)
     : base(context, logger)
     {
     }
@@ -23,8 +24,21 @@ public class AbilitiesController : BaseController
 
     [Authorize(Policy = "GodModePolicy")]
     [HttpDelete]
-    public async Task<IActionResult> Delete(AbilityEntity entity)
+    public async Task<IActionResult> Delete(string id)
     {
-        return await DeleteEntityAsync<AbilityEntity>(entity).ConfigureAwait(false);
+        if (!_context.Set<TribeEntity>().AsEnumerable()
+            .Where(x => x.Ability != null
+            && !string.IsNullOrEmpty(x.Ability.Id))
+            .Any(r => r.Ability!.Id!.Equals(id)))
+        {
+            return await DeleteEntityAsync<ClassEntity>(id);
+        }
+        else
+        {
+            _logger.LogError("Failed attempt to delete {Entity} with the Id: {Id} due to it existing in a {TribeEntity}",
+                nameof(ClassEntity), id, nameof(TribeEntity));
+            return Conflict($"A relationship exists between Class with Id {id} and at least one {nameof(TribeEntity)}, " +
+                "this relationship must be resolved to continue...");
+        }
     }
 }
