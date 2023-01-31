@@ -10,7 +10,14 @@ public static class ServiceCollectionExtensions
     /// <returns><see cref="IServiceCollection"/>with CosmosClient configuration.</returns>
     public static IServiceCollection AddCosmosClient(this IServiceCollection service, CosmosRepositoryOptions options)
     {
-        CosmosSerializationOptions cosmosSerializer = new CosmosSerializationOptions();
+        if (string.IsNullOrEmpty(options.EndPoint) ||
+            string.IsNullOrEmpty(options.AccountKey) ||
+            string.IsNullOrEmpty(options.DatabaseName))
+        {
+            throw new InvalidOperationException($"{nameof(options.EndPoint)}, {nameof(options.AccountKey)}, " +
+                $"{nameof(options.DatabaseName)} must be all not null and not empty.");
+        }
+        CosmosSerializationOptions cosmosSerializer = new();
         options.AllowBulkExecution = true;
         options.MaxRetryAttemptsOnRateLimitedRequests = 100;
         options.MaxRetryWaitTimeOnRateLimitedRequests = TimeSpan.FromSeconds(120);

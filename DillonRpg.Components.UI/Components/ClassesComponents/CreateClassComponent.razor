@@ -1,18 +1,38 @@
-﻿<RadzenText TextStyle="TextStyle.H6" Text="Create Class" />
+﻿@inject IDillonRPGServiceClient _client;
+@inject ILogger<CreateClassComponent> _logger;
+
+<RadzenText TextStyle="TextStyle.H6" Text="Create Class" />
 
 <div class="row mb-2">
     <div class="col">
         <RadzenLabel Text="Enter Class Name" />
-        <RadzenTextBox />
+        <RadzenTextBox  @bind-Value="@_className"/>
     </div>
 </div>
 
 <div class="mb-3">
-    <RadzenButton class="me-2" Click=@(HideComponent) Text="Create" ButtonStyle="ButtonStyle.Primary" />
-    <RadzenButton Click=@(HideComponent) Text="Cancel" ButtonStyle="ButtonStyle.Secondary" />
+    <RadzenButton class="me-2" Click="CreateClass" Text=" Create" ButtonStyle="ButtonStyle.Primary" />
 </div>
 
 @code {
+    private string _className = string.Empty;
     [Parameter]
     public EventCallback HideComponent { get; set; }
+
+    private async Task CreateClass()
+    {
+        Class classEntity = new()
+            {
+                Name = _className
+            };
+
+        await _client.ClassesServiceClient.PostClass(classEntity).HandleResults<Class>(success: (result) =>
+        {
+            Class? res = result?.Content;
+        },
+        failure: (result) =>
+        {
+            result.Error!.LogFailure(_logger, nameof(ClassesServiceClient.PostClass));
+        });
+    }
 }

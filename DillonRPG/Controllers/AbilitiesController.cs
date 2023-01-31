@@ -1,37 +1,55 @@
 ﻿
 namespace DillonRPG.Service.Controllers;
 
-[Authorize]
-[ApiController]
-[Route("[controller]")]
-public class AbilitiesController : ControllerBase
+
+public class AbilitiesController : BaseController
 {
-    [Authorize(Policy = "GodModePolicy")]
-    [HttpGet(Name = "GetAbilities")]
-    public ActionResult<IEnumerable<AbilityEntity>> Get()
+    public AbilitiesController(DillonRPGContext context, ILogger<AbilitiesController> logger)
+    : base(context, logger)
     {
-        return new AbilityEntity[]
+    }
+    [Authorize(Policy = "GodModePolicy")]
+    [HttpGet]
+    public async Task<IActionResult> Get()
+    {
+        return await GetEntitiesAsync<AbilityEntity>().ConfigureAwait(false);
+    }
+
+    [Authorize(Policy = "GodModePolicy")]
+    [HttpPost]
+    public async Task<IActionResult> Post(AbilityEntity entity)
+    {
+        return (await PostEntityAsync(entity).ConfigureAwait(false)).ActionResult;
+    }
+
+    [Authorize(Policy = "GodModePolicy")]
+    [HttpDelete]
+    public async Task<IActionResult> Delete(string id)
+    {
+        if (!_context.Set<TribeEntity>().AsEnumerable()
+            .Where(x => x.Ability != null
+            && !string.IsNullOrEmpty(x.Ability.Id))
+            .Any(r => r.Ability!.Id!.Equals(id)))
         {
-            new AbilityEntity()
-            {
-                Name = "Ability 1",
-                Id = "1"
-            },
-                new AbilityEntity()
-            {
-                Name = "Ability 2",
-                Id = "2"
-            },
-                new AbilityEntity()
-            {
-                Name = "Ability 3",
-                Id = "3"
-            },
-                new AbilityEntity()
-            {
-                Name = "Ability 4",
-                Id = "4"
-            }
-        };
+            return await DeleteEntityAsync<ClassEntity>(id);
+        }
+        else
+        {
+            _logger.LogError("Failed attempt to delete {Entity} with the Id: {Id} due to it existing in a {TribeEntity}",
+                nameof(ClassEntity), id, nameof(TribeEntity));
+            return Conflict($"A relationship exists between Class with Id {id} and at least one {nameof(TribeEntity)}, " +
+                "this relationship must be resolved to continue...");
+        }
+    }
+
+    [Authorize(Policy = "GodModePolicy")]
+    [HttpPatch]
+    public async Task<IActionResult> Patch(AbilityEntity entity)
+    {
+        if (string.IsNullOrEmpty(entity.Id))
+        {
+            return BadRequest($"{nameof(entity.Id)} must not be null or empty and must reference the entity that you intend to update.");
+        }
+        return (await PatchEntityAsync(entity.Id, entity).ConfigureAwait(false)).ActionResult;
     }
 }

@@ -1,12 +1,9 @@
-﻿@typeparam TValue;
-
+﻿
 <RadzenLabel Text="@LabelText" />
 <div>
-    <RadzenDropDown TValue="TValue"
-                    Data="Data"                  
-                    TextProperty="Name"
-                    ValueProperty="Id"
-                    @bind-Value="@BindValue" />
+    <RadzenDropDown TValue="string"
+                    Data="Data"
+                    Change="OnChange"/>
 </div>
 <RadzenButton class="mt-2" Click=@(ButtonClick) Text="Manage" ButtonStyle="ButtonStyle.Success" Shade="Shade.Lighter" />
 

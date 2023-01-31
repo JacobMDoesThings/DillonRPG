@@ -1,18 +1,38 @@
-﻿<RadzenText TextStyle="TextStyle.H6" Text="Create Family" />
+﻿@inject IDillonRPGServiceClient _client;
+@inject ILogger<CreateFamilyComponent> _logger;
+
+<RadzenText TextStyle="TextStyle.H6" Text="Create Family" />
 
 <div class="row mb-2">
     <div class="col">
         <RadzenLabel Text="Enter Family Name" />
-        <RadzenTextBox />
+        <RadzenTextBox @bind-Value="_familyName" />
     </div>
 </div>
 
 <div class="mb-3">
-    <RadzenButton class="me-2" Click=@(HideComponent) Text="Create" ButtonStyle="ButtonStyle.Primary" />
-    <RadzenButton Click=@(HideComponent) Text="Cancel" ButtonStyle="ButtonStyle.Secondary" />
+    <RadzenButton class="me-2" Click="CreateFamily" Text="Create" ButtonStyle="ButtonStyle.Primary" />
 </div>
 
 @code {
     [Parameter]
     public EventCallback HideComponent { get; set; }
+    private string _familyName = string.Empty;
+
+    private async Task CreateFamily()
+    {
+        Family family = new()
+        {
+            Name = _familyName
+        };
+
+        await _client.FamiliesServiceClient.PostFamily(family).HandleResults<Family>(success: (result) =>
+        {
+            Family? res = result?.Content;
+        },
+        failure: (result) =>
+        {
+            result.Error!.LogFailure(_logger, nameof(FamiliesServiceClient.PostFamily));
+        });
+    }
 }

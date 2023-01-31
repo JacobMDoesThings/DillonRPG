@@ -1,46 +1,42 @@
-﻿
-@inject DialogService DialogService
+﻿@inject DialogService DialogService
+@inject IDillonRPGServiceClient _client
+@inject ILogger<CreateTribeComponent> _logger
+
 <RadzenText TextStyle="TextStyle.H6" Text="Create Tribe" />
 
-<div class="row mb-2">
-    <div class="col">
+<div class="row mb-5">
+    <div class="col mb-3">
         <RadzenLabel Text="Enter Tribe Name" />
-        <RadzenTextBox />
+        <div>
+            <RadzenTextBox @bind-Value="@_tribeName" />
+        </div>
     </div>
-    <div class="col">
-        <DropDownWithCreateButtonComponent TValue="string"
-                                           Data="Abilities"
-                                           TextProperty="Name"
-                                           ValueProperty="Id"
-                                           BindValue="_selectedAbility!.Name"
+    <div class="col mb-3">
+        <DropDownWithCreateButtonComponent Data="Abilities.Select(a => a.Name).Distinct()"
                                            LabelText="Select Ability"
+                                           OnChange="(object str) => AbilityChanged(str)"
                                            ButtonClick="OpenManageAbilities" />
     </div>
 
-    <div class="col">
-        <DropDownWithCreateButtonComponent TValue="string"
-                                           Data="Classes"
-                                           TextProperty="Name"
-                                           ValueProperty="Id"
-                                           BindValue="_selectedClass!.Name"
+    <div class="col mb-3">
+        <DropDownWithCreateButtonComponent Data="Classes.Select(d => d.Name).Distinct()"
                                            LabelText="Select Class"
-                                           ButtonClick="OpenManageClasses" />
+                                           ButtonClick="OpenManageClasses" 
+                                           OnChange="(object str) => ClassChanged(str)" />
     </div>
-    <div class="col">
-        <DropDownWithCreateButtonComponent TValue="string"
-                                           Data="Families"
-                                           TextProperty="Name"
-                                           ValueProperty="Id"
-                                           BindValue="_selectedFamily!.Name"
-                                           LabelText="Select Family" 
-                                           ButtonClick="OpenManageFamilies"/>
+    <div class="col mb-3">
+        <DropDownWithCreateButtonComponent Data="Families.Select(f => f.Name).Distinct()"
+                                           LabelText="Select Family"
+                                           ButtonClick="OpenManageFamilies" 
+                                           OnChange="(object str) => FamilyChanged(str)" />
     </div>
 </div>
 <div class="mb-3">
-    <RadzenButton class="me-2" Click=@(HideComponent) Text="Create" ButtonStyle="ButtonStyle.Primary" />
+    <RadzenButton class="me-2" Click="CreateTribe" Text="Create" ButtonStyle="ButtonStyle.Primary" />
     <RadzenButton Click=@(HideComponent) Text="Cancel" ButtonStyle="ButtonStyle.Secondary" />
 </div>
 @code {
+    private string _tribeName = string.Empty;
     private DialogOptions _dOptions = new DialogOptions() { Style = "max-height:75%" };
     private RadzenDropDown<string> check = new();
     [Parameter]
@@ -56,7 +52,55 @@
     private Class? _selectedClass = new();
     private Family? _selectedFamily = new();
 
-    public async Task OpenManageAbilities()
+    private void AbilityChanged(object val)
+    {
+        string? value = val as string;
+        if (!string.IsNullOrEmpty(value))
+        {
+            _selectedAbility = Abilities.Where(a => a.Name.Equals(value, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+        }
+    }
+
+    private void ClassChanged(object val)
+    {
+        string? value = val as string;
+        if (!string.IsNullOrEmpty(value))
+        {
+            _selectedClass = Classes.Where(a => a.Name.Equals(value, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+        }
+    }
+
+    private void FamilyChanged(object val)
+    {
+        string? value = val as string;
+        if (!string.IsNullOrEmpty(value))
+        {
+            _selectedFamily = Families.Where(a => a.Name.Equals(value, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+        }
+    }
+
+
+    private async Task CreateTribe()
+    {
+        Tribe tribe = new()
+            {
+                TribeName = _tribeName,
+                Ability = _selectedAbility,
+                Class = _selectedClass,
+                Family = _selectedFamily
+            };
+
+        await _client.TribesServiceClient.PostTribe(tribe).HandleResults<Tribe>(success: (result) =>
+        {
+            Tribe? res = result?.Content;
+        },
+        failure: (result) =>
+        {
+            result.Error!.LogFailure(_logger, nameof(FamiliesServiceClient.PostFamily));
+        });
+    }
+
+    private async Task OpenManageAbilities()
     {
         await DialogService.OpenAsync<ManageAbilitiesComponent>("",
         new Dictionary<string, object>(){
@@ -64,14 +108,14 @@
             _dOptions);
     }
 
-    public async Task OpenManageClasses()
+    private async Task OpenManageClasses()
     {
         await DialogService.OpenAsync<ManageClassesComponent>("",
         new Dictionary<string, object>(){
             { nameof(ManageClassesComponent.Classes), Classes}},
             _dOptions);
     }
-    public async Task OpenManageFamilies()
+    private async Task OpenManageFamilies()
     {
         await DialogService.OpenAsync<ManageFamiliesComponent>("",
         new Dictionary<string, object>(){

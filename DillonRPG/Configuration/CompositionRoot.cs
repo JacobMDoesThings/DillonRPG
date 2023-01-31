@@ -16,12 +16,8 @@ internal static class CompositionRoot
         services.AddScoped<GraphApiClientService>();
         services.AddTransient<IClaimsTransformation, GraphApiClaimsTransformation>();
         services.AddCosmosClient(settings.CosmosRepositoryOptions);
-        services.AddQueryRepository<DillonRPGContext>();
-        services.AddGenericRepository<DillonRPGContext>();
-
-
+        services.AddDbContext<DillonRPGContext>();
         return services;
-
     }
 
 
@@ -49,9 +45,9 @@ internal static class CompositionRoot
                     settings.SecurityGroups!.Test.SecurityGroupId!));
             });
 
-            options.DefaultPolicy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
+            //options.DefaultPolicy = new AuthorizationPolicyBuilder()
+            //  .RequireAuthenticatedUser()
+            //    .Build();
         });
 
         return services;

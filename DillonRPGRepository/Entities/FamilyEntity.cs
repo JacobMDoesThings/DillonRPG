@@ -3,7 +3,7 @@ namespace DillonRPG.Repository.Entities;
 
 public class FamilyEntity : BaseEntity
 {
-    private const string DocumentType = nameof(AbilityEntity);
+    private const string DocumentType = nameof(FamilyEntity);
 
     /// <summary>
     /// Gets the DocumentType.
@@ -15,11 +15,11 @@ public class FamilyEntity : BaseEntity
     }
 
     /// <summary>
-    /// Gets the PartitionKey for Ability by Name.
+    /// Gets the PartitionKey for Family by Id.
     /// </summary>
     public override string? PartitionKey
     {
-        get => GetPartitionKey(Name);
+        get => GetPartitionKey(Id!);
         set { }
     }
 
@@ -30,9 +30,9 @@ public class FamilyEntity : BaseEntity
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets the PartitionKey, the name of the ability.
+    /// Gets the PartitionKey, the Id of the Family.
     /// </summary>
-    /// <param name="name">The name of the ability.</param>
+    /// <param name="Id">The Id of the Family.</param>
     /// <returns></returns>
-    internal static string GetPartitionKey(string name) => $"{name}".ToLowerInvariant();
+    internal static string GetPartitionKey(string Id) => $"{Id}".ToLowerInvariant();
 }

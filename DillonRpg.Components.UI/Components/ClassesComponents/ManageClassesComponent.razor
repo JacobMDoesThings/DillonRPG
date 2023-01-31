@@ -1,4 +1,7 @@
-﻿<RadzenText Text="Manage Classes" TextStyle="TextStyle.H3" />
+﻿@inject IDillonRPGServiceClient _client;
+@inject ILogger<ManageClassesComponent> _logger;
+
+<RadzenText Text="Manage Classes" TextStyle="TextStyle.H3" />
 
 @{
     if (_showCreateClassComponent)
@@ -9,6 +12,7 @@
     {
         <RadzenButton class="mb-3" Shade="Shade.Lighter" Click=@(() => _showCreateClassComponent = true) Text="Create Class" ButtonStyle="ButtonStyle.Primary" />
     }
+    <RadzenButton class="me-2" Click="DeleteClass" Text="Delete" ButtonStyle="ButtonStyle.Warning" />
 }
 <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="25" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                 Data="@Classes" TItem="Class" LogicalFilterOperator="LogicalFilterOperator.Or">
@@ -18,12 +22,29 @@
 </RadzenDataGrid>
 
 @code {
+    private IList<Ability>? _selectedClasses;
+    private bool _showCreateClassComponent = true;
+
     [Parameter]
     public IEnumerable<Class> Classes { get; set; } = Enumerable.Empty<Class>();
-    private bool _showCreateClassComponent = true;
-    private void OnCreateClassClick()
+  
+
+    private async Task DeleteClass()
     {
-
-
+        var classEntity = _selectedClasses?.FirstOrDefault();
+        if (classEntity is not null)
+        {
+            if (!string.IsNullOrEmpty(classEntity.Id))
+            {
+                await _client.ClassesServiceClient.DeleteClass(classEntity.Id).HandleResults<Class>(success: (result) =>
+                {
+                    var res = result.Content;
+                },
+                failure: (result) =>
+                {
+                    result.Error!.LogFailure(_logger, nameof(ClassesServiceClient.DeleteClass));
+                });
+            }
+        }
     }
 }

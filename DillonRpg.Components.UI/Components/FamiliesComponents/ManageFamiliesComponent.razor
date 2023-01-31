@@ -1,4 +1,7 @@
-﻿<RadzenText Text="Manage Families" TextStyle="TextStyle.H3" />
+﻿@inject IDillonRPGServiceClient _client;
+@inject ILogger<ManageFamiliesComponent> _logger;
+
+<RadzenText Text="Manage Families" TextStyle="TextStyle.H3" />
 
 @{
     if (_showCreateFamilyComponent)
@@ -9,8 +12,11 @@
     {
         <RadzenButton class="mb-3" Shade="Shade.Lighter" Click=@(() => _showCreateFamilyComponent = true) Text="Create Family" ButtonStyle="ButtonStyle.Primary" />
     }
+
+    <RadzenButton class="me-2" Click="DeleteFamily" Text="Delete" ButtonStyle="ButtonStyle.Warning" />
 }
-<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="25" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced"
+                AllowSorting="true" PageSize="25" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                 Data="@Families" TItem="Family" LogicalFilterOperator="LogicalFilterOperator.Or">
     <Columns>
         <RadzenDataGridColumn TItem="Family" Property="@nameof(Family.Name)" Title="Family Name" Frozen="true" />
@@ -18,12 +24,29 @@
 </RadzenDataGrid>
 
 @code {
+    private IList<Ability>? _selectedFamilies;
+    private bool _showCreateFamilyComponent = true;
+
     [Parameter]
     public IEnumerable<Family> Families { get; set; } = Enumerable.Empty<Family>();
-    private bool _showCreateFamilyComponent = true;
-    private void OnCreateFamilyClick()
+
+
+    private async Task DeleteFamily()
     {
-
-
+        var family = _selectedFamilies?.FirstOrDefault();
+        if (family is not null)
+        {
+            if (!string.IsNullOrEmpty(family.Id))
+            {
+                await _client.FamiliesServiceClient.DeleteFamily(family.Id).HandleResults<Family>(success: (result) =>
+                {
+                    var res = result.Content;
+                },
+                failure: (result) =>
+                {
+                    result.Error!.LogFailure(_logger, nameof(FamiliesServiceClient.DeleteFamily));
+                });
+            }
+        }
     }
 }

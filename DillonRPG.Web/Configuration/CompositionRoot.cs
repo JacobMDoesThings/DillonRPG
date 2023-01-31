@@ -105,7 +105,6 @@ internal static class CompositionRoot
 
         AppSettings settings = new()
         {
-            // AzureAdB2C = configuration.GetSection("AzureAdB2C").GetAbilities<AzureAdB2C>(),
             GraphApi = configurationRoot.GetRequiredSection("GraphApi").Get<GraphApi>(),
             DillonRPGService = configurationRoot.GetSection("DillonRPGService").Get<DillonRPGService>(),
             SecurityGroups = configurationRoot.GetSection("SecurityGroups").Get<SecurityGroups>()

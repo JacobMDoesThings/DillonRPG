@@ -27,7 +27,7 @@ public abstract class ServiceClient<T> : IDisposable
         _service = service;
 
         _serviceClient = RestService.For<T>(
-          GetClientWithAuthHeader<IFamiliesServiceClient>(() =>
+          GetClientWithAuthHeader<T>(() =>
           {
               return _tokenAcquistion.GetAccessTokenForUserAsync(_service.Scope!).Result;
           }));

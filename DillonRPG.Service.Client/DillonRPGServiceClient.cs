@@ -23,4 +23,6 @@ public class DillonRPGServiceClient : IDillonRPGServiceClient
     public IClassesServiceClient ClassesServiceClient => new ClassesServiceClient(_client, _tokenAcquisition, _service);
 
     public IFamiliesServiceClient FamiliesServiceClient => new FamiliesServiceClient(_client, _tokenAcquisition, _service);
+ 
+    public ITribeServiceClient TribesServiceClient => new TribeServiceClient(_client, _tokenAcquisition, _service);
 }

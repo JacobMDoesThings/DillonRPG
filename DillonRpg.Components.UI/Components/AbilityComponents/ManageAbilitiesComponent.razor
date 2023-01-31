@@ -1,29 +1,111 @@
-﻿<RadzenText Text="Manage Abilities" TextStyle="TextStyle.H3" />
+﻿@inject IDillonRPGServiceClient _client;
+@inject ILogger<ManageAbilitiesComponent> _logger;
+
+<RadzenText Text="Manage Abilities" TextStyle="TextStyle.H3" />
 
 @{
     if (_showCreateAbilityComponent)
     {
-            <CreateAbilityComponent HideComponent="()=>_showCreateAbilityComponent = false"/>
+        <CreateAbilityComponent HideComponent="()=>_showCreateAbilityComponent = false" />
     }
     else
     {
         <RadzenButton class="mb-3" Shade="Shade.Lighter" Click=@(() => _showCreateAbilityComponent = true) Text="Create Ability" ButtonStyle="ButtonStyle.Primary" />
     }
+
+    <RadzenButton class="me-2" Click="DeleteAbility" Text="Delete" ButtonStyle="ButtonStyle.Warning" />
 }
-<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="25" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced"
+                SelectionMode="DataGridSelectionMode.Single" @bind-Value="_selectedAbilities" AllowSorting="true" PageSize="25" AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true" @ref="_abilityGrid" EditMode="DataGridEditMode.Single"
                 Data="@Abilities" TItem="Ability" LogicalFilterOperator="LogicalFilterOperator.Or">
     <Columns>
-        <RadzenDataGridColumn TItem="Ability" Property="@nameof(Ability.Name)" Title="Ability Name" Frozen="true" />
+        <RadzenDataGridColumn TItem="Ability" Property="@nameof(Ability.Name)" Title="Ability Name" Frozen="true">
+            <EditTemplate Context="ability">
+                <RadzenTextBox @bind-Value="ability.Name"  Style="width:100%; display: block;" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Ability" Context="AbilityName" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="156px">
+            <Template Context="ability">
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="(args)=>EditRow(ability)" @onclick:stopPropagation="true" />
+            </Template>
+            <EditTemplate Context="ability">
+                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(ability))">
+                </RadzenButton>
+                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => CancelEdit(ability))">
+                </RadzenButton>
+            </EditTemplate>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
 @code {
+    private IList<Ability>? _selectedAbilities;
+    private Ability? _abilityToUpdate;
+    private Ability? _abilityToInsert;
+    private RadzenDataGrid<Ability>? _abilityGrid = new();
+
     [Parameter]
     public IEnumerable<Ability> Abilities { get; set; } = Enumerable.Empty<Ability>();
     private bool _showCreateAbilityComponent = true;
-    private void OnCreateAbilityClick()
+
+    private async Task DeleteAbility()
     {
+        var ability = _selectedAbilities?.FirstOrDefault();
+        if (ability is not null)
+        {
+            if (!string.IsNullOrEmpty(ability.Id))
+            {
+                await _client.AbilitiesServiceClient.DeleteAbility(ability.Id).HandleResults<Ability>(success: (result) =>
+                {
+                    var res = result.Content;
+                },
+                failure: (result) =>
+                {
+                    result.Error!.LogFailure(_logger, nameof(AbilitiesServiceClient.DeleteAbility));
+                });
+            }
+        }
+    }
 
+    private async Task EditRow(Ability ability)
+    {
+        if (_abilityGrid is not null)
+        {
+            _abilityToUpdate = ability;
+            await _abilityGrid.EditRow(ability);
+        }
+    }
 
+    private async Task SaveRow(Ability ability)
+    {
+        if (_abilityGrid is not null)
+        {
+            var result = await _client.AbilitiesServiceClient.PatchAbility(ability);
+            if (result.IsSuccessStatusCode)
+            {
+                await _abilityGrid.UpdateRow(ability);
+            }
+        }
+    }
+
+    private void CancelEdit(Ability ability)
+    {
+        if (ability == _abilityToInsert)
+        {
+            _abilityToInsert = null;
+        }
+
+        _abilityToUpdate = null;
+
+        _abilityGrid?.CancelEditRow(ability);
+
+        // For production
+        //var orderEntry = dbContext.Entry(order);
+        //if (orderEntry.State == EntityState.Modified)
+        //{
+        //    orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
+        //    orderEntry.State = EntityState.Unchanged;
+        //}
     }
 }
