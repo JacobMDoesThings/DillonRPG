@@ -15,11 +15,11 @@ public class TribeEntity : BaseEntity
     }
 
     /// <summary>
-    /// Gets the PartitionKey for Tribe by TribeName.
+    /// Gets the PartitionKey for Tribe by Id.
     /// </summary>
     public override string? PartitionKey
     {
-        get => GetPartitionKey(TribeName);
+        get => GetPartitionKey(Id!);
         set { }
     }
 
@@ -45,9 +45,9 @@ public class TribeEntity : BaseEntity
     public FamilyEntity? Family { get; set; }
 
     /// <summary>
-    /// Gets the PartitionKey, the name of the tribe.
+    /// Gets the PartitionKey, the Id of the tribe.
     /// </summary>
-    /// <param name="tribeName">The name of the tribe.</param>
+    /// <param name="Id">The Id of the tribe.</param>
     /// <returns></returns>
-    internal static string GetPartitionKey(string tribeName) => $"{tribeName}".ToLowerInvariant();
+    internal static string GetPartitionKey(string Id) => $"{Id}".ToLowerInvariant();
 }

@@ -12,4 +12,7 @@ public interface IAbilitiesServiceClient : IServiceClient
 
     [Delete("/Abilities")]
     public Task<ApiResponse<Ability>> DeleteAbility(string id);
+
+    [Patch("/Abilities")]
+    public Task<ApiResponse<Ability>> PatchAbility(Ability ability);
 }

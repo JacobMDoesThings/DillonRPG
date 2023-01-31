@@ -15,11 +15,11 @@ public class AbilityEntity : BaseEntity
     }
 
     /// <summary>
-    /// Gets the PartitionKey for Ability by Name.
+    /// Gets the PartitionKey for Ability by Id.
     /// </summary>
     public override string? PartitionKey
     {
-        get => GetPartitionKey(Name);
+        get => GetPartitionKey(Id!);
         set { }
     }
 
@@ -30,9 +30,9 @@ public class AbilityEntity : BaseEntity
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets the PartitionKey, the name of the ability.
+    /// Gets the PartitionKey, the Id of the ability.
     /// </summary>
-    /// <param name="name">The name of the ability.</param>
+    /// <param name="Id">The Id of the ability.</param>
     /// <returns></returns>
-    internal static string GetPartitionKey(string name) => $"{name}".ToLowerInvariant();
+    internal static string GetPartitionKey(string Id) => $"{Id}".ToLowerInvariant();
 }

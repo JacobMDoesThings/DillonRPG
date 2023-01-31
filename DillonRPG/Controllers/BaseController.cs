@@ -1,7 +1,4 @@
 ﻿
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.Extensions.Logging;
-
 namespace DillonRPG.Service.Controllers;
 
 //[Authorize]
@@ -152,9 +149,75 @@ public class BaseController : ControllerBase
     }
 
     /// <summary>
-    /// Unexpected the server error.
+    /// Update an entity asynchronous in data store.
     /// </summary>
-    /// <returns>Returns <see cref="ObjectResult"/> for response.</returns>
-   // public ObjectResult InternalServerError() => StatusCode((int) HttpStatusCode.InternalServerError, "Unexpected server error, please try again later or contact support.");
+    /// <typeparam name="T">Type of Entity.</typeparam>
+    /// <param name="key">The entity identifier.</param>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// Returns an updated entity result.
+    /// </returns>
+    protected virtual async Task<(IActionResult ActionResult, bool IsSuccess)> PatchEntityAsync<T>(string key, T entity)
+        where T : BaseEntity
+    {
+        if (!ModelState.IsValid)
+        {
+            return (BadRequest(ModelState), default);
+        }
+
+        EntityEntry<T>? entityEntry = default;
+        try
+        {
+            entityEntry = _context.Entry(entity);
+            entityEntry.State = EntityState.Modified;
+            entityEntry.RemoveBaseMetadataFromUpdate();
+
+            var entitySet = _context.Set<T>();
+
+
+            T? storedEntity = await entitySet.FirstOrDefaultAsync(e => e.Id == key);
+
+            if (storedEntity == null)
+            {
+                return (NotFound(), default);
+            }
+
+            entity.PartitionKey = "splash attack";
+            entitySet.Update(entity);
+
+            _context.SaveChanges();
+
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            Debug.Write(ex.ToString());
+
+            try
+            {
+                if (entityEntry != null)
+                {
+                    await entityEntry.ReloadAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Write(e.ToString());
+                if (e.Message.Contains("is part of a key"))
+                {
+                    ModelState.AddModelError(nameof(entity), $"Violation of unique key constraints, {typeof(T).Name} cannot be modified for its 'key' properties.");
+                    return (Conflict(ModelState), default);
+                }
+            }
+
+            return (Conflict(entityEntry?.Entity), default);
+        }
+        catch (DbUpdateException ex)
+        {
+            Debug.Write(ex.ToString());
+            return (UnprocessableEntity(entity), default);
+        }
+
+        return (Ok(entityEntry.Entity), true);
+    }
 
 }

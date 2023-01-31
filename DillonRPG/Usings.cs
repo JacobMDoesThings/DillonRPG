@@ -2,16 +2,15 @@
 global using Microsoft.Identity.Web;
 global using Microsoft.Azure.Cosmos;
 global using DillonRPG.Repository.Entities;
-global using TanvirArjel.EFCore.GenericRepository;
 global using Microsoft.Extensions.Caching.Memory;
 global using Microsoft.EntityFrameworkCore;
 global using DillonRPG.Repository;
-global using System.ComponentModel.DataAnnotations;
 global using DillonRPG.Common.SecurityConfiguration;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Authentication;
 global using Microsoft.AspNetCore.Mvc;
-global using System.Net;
+global using Microsoft.EntityFrameworkCore.ChangeTracking;
+global using System.Diagnostics;
 global using DillonRPG.Common.Configuration;
 
 

@@ -1,5 +1,6 @@
 ﻿namespace DillonRPG.Repository;
 
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Cosmos;
 public static class RepositoryExtensions
 {
@@ -35,5 +36,16 @@ public static class RepositoryExtensions
         entityTypeBuilder.HasDiscriminator(e => e.Type);
 
         return entityTypeBuilder;
+    }
+
+    public static void RemoveBaseMetadataFromUpdate<T>(this EntityEntry<T> entityEntry)
+        where T : BaseEntity
+    {
+        entityEntry.Property(x => x.Id).IsModified = false;
+        entityEntry.Property(x => x.PartitionKey).IsModified = false;
+        entityEntry.Property(x => x.Type).IsModified = false;
+        entityEntry.Property(x => x.CreatedOn).IsModified = false;
+        entityEntry.Property(x => x.UpdatedOn).IsModified = false;
+        entityEntry.Property(x => x.Etag).IsModified = false;
     }
 }

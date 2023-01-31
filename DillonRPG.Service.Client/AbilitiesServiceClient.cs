@@ -24,4 +24,9 @@ public class AbilitiesServiceClient : ServiceClient<IAbilitiesServiceClient>, IA
     {
         return await _serviceClient!.DeleteAbility(id);
     }
+
+    public async Task<ApiResponse<Ability>> PatchAbility(Ability ability)
+    {
+        return await _serviceClient!.PatchAbility(ability);
+    }
 }
