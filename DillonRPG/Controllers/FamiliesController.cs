@@ -40,4 +40,15 @@ public class FamiliesController : BaseController
                 "this relationship must be resolved to continue...");
         }
     }
+
+    [Authorize(Policy = "GodModePolicy")]
+    [HttpPatch]
+    public async Task<IActionResult> Patch(FamilyEntity entity)
+    {
+        if (string.IsNullOrEmpty(entity.Id))
+        {
+            return BadRequest($"{nameof(entity.Id)} must not be null or empty and must reference the entity that you intend to update.");
+        }
+        return (await PatchEntityAsync(entity.Id, entity).ConfigureAwait(false)).ActionResult;
+    }
 }

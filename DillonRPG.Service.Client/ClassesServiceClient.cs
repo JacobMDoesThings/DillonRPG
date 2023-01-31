@@ -19,8 +19,13 @@ public class ClassesServiceClient : ServiceClient<IClassesServiceClient>, IClass
         return await _serviceClient!.GetClasses().ConfigureAwait(false); ;
     }
 
+    public async Task<ApiResponse<Class>> PatchClass(Class classEntity)
+    {
+        return await _serviceClient!.PatchClass(classEntity).ConfigureAwait(false);
+    }
+
     public async Task<ApiResponse<Class>> PostClass(Class classEntity)
     {
-        return await _serviceClient!.PostClass(classEntity).ConfigureAwait(false); ;
+        return await _serviceClient!.PostClass(classEntity).ConfigureAwait(false);
     }
 }

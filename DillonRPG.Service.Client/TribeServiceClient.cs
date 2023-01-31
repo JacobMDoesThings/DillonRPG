@@ -19,4 +19,14 @@ public class TribeServiceClient : ServiceClient<ITribeServiceClient>, ITribeServ
     {
         return await _serviceClient!.PostTribe(tribe).ConfigureAwait(false);
     }
+
+    public async Task<ApiResponse<Tribe>> DeleteTribe(Tribe tribe)
+    {
+        return await _serviceClient!.DeleteTribe(tribe).ConfigureAwait(false);
+    }
+
+    public async Task<ApiResponse<Tribe>> PatchTribe(Tribe tribe)
+    {
+        return await _serviceClient!.PatchTribe(tribe).ConfigureAwait(false);
+    }
 }

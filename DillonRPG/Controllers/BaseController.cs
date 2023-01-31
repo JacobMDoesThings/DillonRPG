@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+
 namespace DillonRPG.Service.Controllers;
 
 //[Authorize]
@@ -71,7 +73,7 @@ public class BaseController : ControllerBase
             return Ok(entity);
         }
         catch (Exception ex)
-        {           
+        {
             _logger.LogError("Error encountered on getting records for entity with Id#{key} of type {type} from database. {exception}", key, typeof(T).Name, ex);
             return StatusCode(500);
         }
@@ -80,10 +82,11 @@ public class BaseController : ControllerBase
     protected virtual async Task<IActionResult> DeleteEntityAsync<T>(string id)
        where T : BaseEntity
     {
+        T? entity = null;
         try
         {
-            var entity = await _context.FindAsync<T>(id);
-        
+            entity = await _context.FindAsync<T>(id);
+
             if (entity is null)
             {
                 return NotFound();
@@ -91,6 +94,10 @@ public class BaseController : ControllerBase
             _context.Remove(entity);
             _context.SaveChanges();
             return Ok();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            return Conflict(entity);
         }
         catch (Exception ex)
         {
@@ -103,10 +110,10 @@ public class BaseController : ControllerBase
        where T : BaseEntity
     {
         _context.Attach(entity);
-         if (!ModelState.IsValid)
-         {
-             return (BadRequest(ModelState), default);
-         }
+        if (!ModelState.IsValid)
+        {
+            return (BadRequest(ModelState), default);
+        }
 
         var entityEntry = _context.Set<T>().Add(entity);
 
@@ -119,24 +126,9 @@ public class BaseController : ControllerBase
             }
         }
 
-        // Todo : Handle Cosmos DB Exception violating Key Constraints
-        /* catch (DbUpdateException ex)
-         {
-             if (ex.InnerException is SqlException sqlEx && sqlEx != null)
-             {
-                 if (sqlEx.Number == 2627)
-                 {
-                     ModelState.AddModelError(nameof(entity), $"Violation of unique key constraints, {typeof(T).Name} already exists with unique constraint values.");
-                     return (UnprocessableEntity(ModelState), default);
-                 }
-             }
-
-             return (UnprocessableEntity(entity), default);
-         }*/
-
         catch (Exception ex)
         {
-            _logger.LogError("Error encountered on creating new records for entity of type {type} in database. {exception} ",typeof(T).Name, ex);
+            _logger.LogError("Error encountered on creating new records for entity of type {type} in database. {exception} ", typeof(T).Name, ex);
             return (StatusCode(500), default);
         }
 
@@ -182,7 +174,6 @@ public class BaseController : ControllerBase
                 return (NotFound(), default);
             }
 
-            entity.PartitionKey = "splash attack";
             entitySet.Update(entity);
 
             _context.SaveChanges();
@@ -190,30 +181,15 @@ public class BaseController : ControllerBase
         }
         catch (DbUpdateConcurrencyException ex)
         {
-            Debug.Write(ex.ToString());
-
-            try
+            if (entityEntry is not null)
             {
-                if (entityEntry != null)
-                {
-                    await entityEntry.ReloadAsync();
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.Write(e.ToString());
-                if (e.Message.Contains("is part of a key"))
-                {
-                    ModelState.AddModelError(nameof(entity), $"Violation of unique key constraints, {typeof(T).Name} cannot be modified for its 'key' properties.");
-                    return (Conflict(ModelState), default);
-                }
+                await entityEntry.ReloadAsync();
             }
 
             return (Conflict(entityEntry?.Entity), default);
         }
         catch (DbUpdateException ex)
         {
-            Debug.Write(ex.ToString());
             return (UnprocessableEntity(entity), default);
         }
 

@@ -11,4 +11,7 @@ public interface IFamiliesServiceClient : IServiceClient
 
     [Delete("/Families")]
     public Task<ApiResponse<Family>> DeleteFamily(string id);
+
+    [Patch("/Families")]
+    public Task<ApiResponse<Family>> PatchFamily(Family family);
 }

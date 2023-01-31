@@ -25,4 +25,10 @@ public class FamiliesServiceClient : ServiceClient<IFamiliesServiceClient>, IFam
     {
         return await _serviceClient!.PostFamily(family).ConfigureAwait(false);
     }
+
+    public async Task<ApiResponse<Family>> PatchFamily(Family family)
+    {
+        return await _serviceClient!.PatchFamily(family).ConfigureAwait(false);
+    }
+
 }

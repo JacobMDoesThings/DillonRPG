@@ -12,4 +12,7 @@ public interface IClassesServiceClient : IServiceClient
 
     [Delete("/Classes")]
     public Task<ApiResponse<Class>> DeleteClass(string id);
+
+    [Patch("/Classes")]
+    public Task<ApiResponse<Class>> PatchClass(Class classEntity);
 }

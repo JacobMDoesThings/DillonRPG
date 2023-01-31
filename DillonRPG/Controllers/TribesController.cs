@@ -44,4 +44,15 @@ public class TribesController : BaseController
     {
         return (await PostEntityAsync(entity).ConfigureAwait(false)).ActionResult;
     }
+
+    [Authorize(Policy = "GodModePolicy")]
+    [HttpPatch]
+    public async Task<IActionResult> Patch(TribeEntity entity)
+    {
+        if (string.IsNullOrEmpty(entity.Id))
+        {
+            return BadRequest($"{nameof(entity.Id)} must not be null or empty and must reference the entity that you intend to update.");
+        }
+        return (await PatchEntityAsync(entity.Id, entity).ConfigureAwait(false)).ActionResult;
+    }
 }
